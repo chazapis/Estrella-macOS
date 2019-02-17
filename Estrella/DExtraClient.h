@@ -1,5 +1,5 @@
 //
-// ViewController.h
+// DExtraClient.h
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -17,8 +17,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
+#import <CocoaAsyncSocket/GCDAsyncUdpSocket.h>
 
-@interface ViewController : NSViewController
+@interface DExtraClient : NSObject <GCDAsyncUdpSocketDelegate>
+
+- (void)connectToHost:(NSString *)host port:(NSInteger)port usingCallsign:(NSString *)callsign;
+- (void)disconnect;
 
 @end

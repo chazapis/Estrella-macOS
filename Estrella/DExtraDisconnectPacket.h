@@ -1,5 +1,5 @@
 //
-// ViewController.h
+// DExtraDisconnectPacket.h
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -17,8 +17,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
-@interface ViewController : NSViewController
+@interface DExtraDisconnectPacket : NSObject
+
++ (DExtraDisconnectPacket *)packetFromData:(NSData *)data;
+
+- (id)initWithSrcCallsign:(NSString *)srcCallsign srcModule:(NSString *)srcModule;
+- (NSData *)toData;
+- (NSString *)toString;
+
+@property(nonatomic, strong) NSString *srcCallsign;
+@property(nonatomic, strong) NSString *srcModule;
 
 @end

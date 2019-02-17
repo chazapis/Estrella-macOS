@@ -1,5 +1,5 @@
 //
-// ViewController.h
+// DExtraDisconnectAckPacket.m
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -17,8 +17,31 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#import <Cocoa/Cocoa.h>
+#import "DExtraDisconnectAckPacket.h"
 
-@interface ViewController : NSViewController
+@implementation DExtraDisconnectAckPacket
+
++ (DExtraDisconnectAckPacket *)packetFromData:(NSData *)data {
+    if ([data length] != 12)
+        return nil;
+    
+    char packet[12];
+    [data getBytes:packet length:12];
+    NSString *disconnected = [[NSString alloc] initWithBytes:packet length:12 encoding:NSUTF8StringEncoding];
+    if (disconnected == nil || ![disconnected isEqualToString:@"DISCONNECTED"])
+        return nil;
+
+    return [[DExtraDisconnectAckPacket alloc] init];
+}
+
+- (NSData *)toData {
+    char packet[13] = "DISCONNECTED";
+    
+    return [NSData dataWithBytes:packet length:12]; // Don't send NULL termination byte
+}
+
+- (NSString *)toString {
+    return @"DExtraDisconnectAckPacket";
+}
 
 @end
