@@ -23,9 +23,11 @@
 
 + (DExtraDisconnectPacket *)packetFromData:(NSData *)data;
 
-- (id)initWithSrcCallsign:(NSString *)srcCallsign srcModule:(NSString *)srcModule;
+- (id)initWithSrcCallsign:(NSString *)srcCallsign
+                srcModule:(NSString *)srcModule;
+
 - (NSData *)toData;
-- (NSString *)toString;
+- (NSString *)description;
 
 @property(nonatomic, strong) NSString *srcCallsign;
 @property(nonatomic, strong) NSString *srcModule;

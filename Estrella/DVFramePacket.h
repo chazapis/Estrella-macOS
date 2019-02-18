@@ -1,5 +1,5 @@
 //
-// DExtraConnectPacket.h
+// DVFramePacket.h
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -19,21 +19,27 @@
 
 #import <Foundation/Foundation.h>
 
-@interface DExtraConnectPacket : NSObject
+#import "DSTARFrame.h"
 
-+ (DExtraConnectPacket *)packetFromData:(NSData *)data;
+@interface DVFramePacket : NSObject
 
-- (id)initWithSrcCallsign:(NSString *)srcCallsign
-                srcModule:(NSString *)srcModule
-               destModule:(NSString *)destModule
-                 revision:(unsigned char)revision;
++ (DVFramePacket *)packetFromData:(NSData *)data;
+
+- (id)initWithBand1:(unsigned char)band1
+              band2:(unsigned char)band2
+              band3:(unsigned char)band3
+           streamId:(unsigned short)streamId
+           packetId:(unsigned char)packetId
+         dstarFrame:(DSTARFrame *)dstarFrame;
 
 - (NSData *)toData;
 - (NSString *)description;
 
-@property(nonatomic, strong) NSString *srcCallsign;
-@property(nonatomic, strong) NSString *srcModule;
-@property(nonatomic, strong) NSString *destModule;
-@property(nonatomic, assign) unsigned char revision;
+@property(nonatomic, assign) unsigned char band1;
+@property(nonatomic, assign) unsigned char band2;
+@property(nonatomic, assign) unsigned char band3;
+@property(nonatomic, assign) unsigned short streamId;
+@property(nonatomic, assign) unsigned char packetId;
+@property(nonatomic, strong) DSTARFrame *dstarFrame;
 
 @end

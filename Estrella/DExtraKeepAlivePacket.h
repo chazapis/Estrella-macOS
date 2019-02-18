@@ -24,8 +24,9 @@
 + (DExtraKeepAlivePacket *)packetFromData:(NSData *)data;
 
 - (id)initWithSrcCallsign:(NSString *)srcCallsign;
+
 - (NSData *)toData;
-- (NSString *)toString;
+- (NSString *)description;
 
 @property(nonatomic, strong) NSString *srcCallsign;
 

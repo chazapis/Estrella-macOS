@@ -24,6 +24,6 @@
 + (DExtraDisconnectAckPacket *)packetFromData:(NSData *)data;
 
 - (NSData *)toData;
-- (NSString *)toString;
+- (NSString *)description;
 
 @end

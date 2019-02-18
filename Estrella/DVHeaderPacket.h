@@ -1,5 +1,5 @@
 //
-// DExtraConnectPacket.h
+// DVHeaderPacket.h
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -19,21 +19,25 @@
 
 #import <Foundation/Foundation.h>
 
-@interface DExtraConnectPacket : NSObject
+#import "DSTARHeader.h"
 
-+ (DExtraConnectPacket *)packetFromData:(NSData *)data;
+@interface DVHeaderPacket : NSObject
 
-- (id)initWithSrcCallsign:(NSString *)srcCallsign
-                srcModule:(NSString *)srcModule
-               destModule:(NSString *)destModule
-                 revision:(unsigned char)revision;
++ (DVHeaderPacket *)packetFromData:(NSData *)data;
+
+- (id)initWithBand1:(unsigned char)band1
+              band2:(unsigned char)band2
+              band3:(unsigned char)band3
+           streamId:(unsigned short)streamId
+        dstarHeader:(DSTARHeader *)dstarHeader;
 
 - (NSData *)toData;
 - (NSString *)description;
 
-@property(nonatomic, strong) NSString *srcCallsign;
-@property(nonatomic, strong) NSString *srcModule;
-@property(nonatomic, strong) NSString *destModule;
-@property(nonatomic, assign) unsigned char revision;
+@property(nonatomic, assign) unsigned char band1;
+@property(nonatomic, assign) unsigned char band2;
+@property(nonatomic, assign) unsigned char band3;
+@property(nonatomic, assign) unsigned short streamId;
+@property(nonatomic, strong) DSTARHeader *dstarHeader;
 
 @end

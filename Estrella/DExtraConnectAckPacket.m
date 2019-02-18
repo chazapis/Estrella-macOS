@@ -28,12 +28,12 @@
     char packet[14];
     
     [data getBytes:packet length:14];
-    NSString *ack = [[NSString alloc] initWithBytes:&(packet[10]) length:4 encoding:NSUTF8StringEncoding];
+    NSString *ack = [[NSString alloc] initWithBytes:&(packet[10]) length:4 encoding:NSASCIIStringEncoding];
     if (ack == nil || ![ack isEqualToString:@"ACK"])
         return nil;
-    NSString *srcCallsign = [[NSString alloc] initWithBytes:&(packet[0]) length:8 encoding:NSUTF8StringEncoding];
-    NSString *srcModule = [[NSString alloc] initWithBytes:&(packet[8]) length:1 encoding:NSUTF8StringEncoding];
-    NSString *destModule = [[NSString alloc] initWithBytes:&(packet[9]) length:1 encoding:NSUTF8StringEncoding];
+    NSString *srcCallsign = [[NSString alloc] initWithBytes:&(packet[0]) length:8 encoding:NSASCIIStringEncoding];
+    NSString *srcModule = [[NSString alloc] initWithBytes:&(packet[8]) length:1 encoding:NSASCIIStringEncoding];
+    NSString *destModule = [[NSString alloc] initWithBytes:&(packet[9]) length:1 encoding:NSASCIIStringEncoding];
     if (srcCallsign == nil || srcModule == nil || destModule == nil)
         return nil;
     if ([destModule isEqualToString:@" "])
@@ -49,7 +49,7 @@
 - (id)initWithSrcCallsign:(NSString *)srcCallsign
                 srcModule:(NSString *)srcModule
                destModule:(NSString *)destModule
-                 revision:(NSInteger)revision {
+                 revision:(unsigned char)revision {
     if (self = [super init]) {
         self.srcCallsign = srcCallsign;
         self.srcModule = srcModule;
@@ -66,22 +66,22 @@
     NSString *paddedModule;
     
     paddedCallsign = [self.srcCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
-    [paddedCallsign getCString:&(packet[0]) maxLength:9 encoding:NSUTF8StringEncoding];
+    [paddedCallsign getCString:&(packet[0]) maxLength:9 encoding:NSASCIIStringEncoding];
     paddedModule = [self.srcCallsign stringByPaddingToLength:1 withString:@" " startingAtIndex:0];
-    [paddedModule getCString:&(packet[8]) maxLength:2 encoding:NSUTF8StringEncoding];
+    [paddedModule getCString:&(packet[8]) maxLength:2 encoding:NSASCIIStringEncoding];
     paddedModule = [self.destModule stringByPaddingToLength:1 withString:@" " startingAtIndex:0];
-    [paddedModule getCString:&(packet[9]) maxLength:2 encoding:NSUTF8StringEncoding];
+    [paddedModule getCString:&(packet[9]) maxLength:2 encoding:NSASCIIStringEncoding];
     if (self.revision == 2) {
         packet[10] = 0;
         return [NSData dataWithBytes:packet length:11];
     } else {
-        [@"ACK" getCString:&(packet[10]) maxLength:4 encoding:NSUTF8StringEncoding];
+        [@"ACK" getCString:&(packet[10]) maxLength:4 encoding:NSASCIIStringEncoding];
     	return [NSData dataWithBytes:packet length:14];
     }
 }
 
-- (NSString *)toString {
-    return [NSString stringWithFormat:@"DExtraConnectAckPacket srcCallsign: %@ srcModule: %@ destModule: %@ revision:%ld", self.srcCallsign, self.srcModule, self.destModule, self.revision];
+- (NSString *)description {
+    return [NSString stringWithFormat:@"DExtraConnectAckPacket srcCallsign: %@ srcModule: %@ destModule: %@ revision: %hhu", self.srcCallsign, self.srcModule, self.destModule, self.revision];
 }
 
 @end

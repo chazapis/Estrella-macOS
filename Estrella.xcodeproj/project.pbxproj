@@ -17,6 +17,10 @@
 		E27CA62B2219F66200600899 /* DExtraDisconnectPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA62A2219F66200600899 /* DExtraDisconnectPacket.m */; };
 		E27CA62E221A082E00600899 /* DExtraDisconnectAckPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA62D221A082E00600899 /* DExtraDisconnectAckPacket.m */; };
 		E27CA631221A0B7300600899 /* DExtraKeepAlivePacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA630221A0B7300600899 /* DExtraKeepAlivePacket.m */; };
+		E27CA634221A913000600899 /* DVHeaderPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA633221A913000600899 /* DVHeaderPacket.m */; };
+		E27CA637221AA3A300600899 /* DVFramePacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA636221AA3A300600899 /* DVFramePacket.m */; };
+		E27CA63A221AAD4500600899 /* DSTARHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA639221AAD4500600899 /* DSTARHeader.m */; };
+		E27CA63D221AAD8C00600899 /* DSTARFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA63C221AAD8C00600899 /* DSTARFrame.m */; };
 		E292C0B322153899009FE9A9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E292C0B222153899009FE9A9 /* AppDelegate.m */; };
 		E292C0B622153899009FE9A9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E292C0B522153899009FE9A9 /* ViewController.m */; };
 		E292C0B82215389B009FE9A9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E292C0B72215389B009FE9A9 /* Assets.xcassets */; };
@@ -65,6 +69,14 @@
 		E27CA62D221A082E00600899 /* DExtraDisconnectAckPacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DExtraDisconnectAckPacket.m; sourceTree = "<group>"; };
 		E27CA62F221A0B7300600899 /* DExtraKeepAlivePacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DExtraKeepAlivePacket.h; sourceTree = "<group>"; };
 		E27CA630221A0B7300600899 /* DExtraKeepAlivePacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DExtraKeepAlivePacket.m; sourceTree = "<group>"; };
+		E27CA632221A913000600899 /* DVHeaderPacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVHeaderPacket.h; sourceTree = "<group>"; };
+		E27CA633221A913000600899 /* DVHeaderPacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVHeaderPacket.m; sourceTree = "<group>"; };
+		E27CA635221AA3A300600899 /* DVFramePacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVFramePacket.h; sourceTree = "<group>"; };
+		E27CA636221AA3A300600899 /* DVFramePacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVFramePacket.m; sourceTree = "<group>"; };
+		E27CA638221AAD4500600899 /* DSTARHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DSTARHeader.h; sourceTree = "<group>"; };
+		E27CA639221AAD4500600899 /* DSTARHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DSTARHeader.m; sourceTree = "<group>"; };
+		E27CA63B221AAD8C00600899 /* DSTARFrame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DSTARFrame.h; sourceTree = "<group>"; };
+		E27CA63C221AAD8C00600899 /* DSTARFrame.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DSTARFrame.m; sourceTree = "<group>"; };
 		E292C0AE22153899009FE9A9 /* Estrella.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Estrella.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E292C0B122153899009FE9A9 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E292C0B222153899009FE9A9 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -113,6 +125,14 @@
 				E27CA62D221A082E00600899 /* DExtraDisconnectAckPacket.m */,
 				E27CA62F221A0B7300600899 /* DExtraKeepAlivePacket.h */,
 				E27CA630221A0B7300600899 /* DExtraKeepAlivePacket.m */,
+				E27CA632221A913000600899 /* DVHeaderPacket.h */,
+				E27CA633221A913000600899 /* DVHeaderPacket.m */,
+				E27CA635221AA3A300600899 /* DVFramePacket.h */,
+				E27CA636221AA3A300600899 /* DVFramePacket.m */,
+				E27CA638221AAD4500600899 /* DSTARHeader.h */,
+				E27CA639221AAD4500600899 /* DSTARHeader.m */,
+				E27CA63B221AAD8C00600899 /* DSTARFrame.h */,
+				E27CA63C221AAD8C00600899 /* DSTARFrame.m */,
 			);
 			name = Packets;
 			sourceTree = "<group>";
@@ -232,12 +252,16 @@
 				E27CA61E2219264800600899 /* DExtraClient.m in Sources */,
 				E27CA62E221A082E00600899 /* DExtraDisconnectAckPacket.m in Sources */,
 				E27CA631221A0B7300600899 /* DExtraKeepAlivePacket.m in Sources */,
+				E27CA637221AA3A300600899 /* DVFramePacket.m in Sources */,
 				E27CA6212219D1A000600899 /* DExtraConnectPacket.m in Sources */,
 				E292C0B622153899009FE9A9 /* ViewController.m in Sources */,
 				E27CA6282219F5D200600899 /* DExtraConnectNackPacket.m in Sources */,
+				E27CA63A221AAD4500600899 /* DSTARHeader.m in Sources */,
 				E292C0BE2215389B009FE9A9 /* main.m in Sources */,
 				E27CA62B2219F66200600899 /* DExtraDisconnectPacket.m in Sources */,
 				E27CA6252219F42B00600899 /* DExtraConnectAckPacket.m in Sources */,
+				E27CA634221A913000600899 /* DVHeaderPacket.m in Sources */,
+				E27CA63D221AAD8C00600899 /* DSTARFrame.m in Sources */,
 				E292C0B322153899009FE9A9 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

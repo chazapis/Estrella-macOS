@@ -1,5 +1,5 @@
 //
-// DExtraDisconnectAckPacket.m
+// DSTARFrame.m
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -17,31 +17,44 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#import "DExtraDisconnectAckPacket.h"
+#import "DSTARFrame.h"
 
-@implementation DExtraDisconnectAckPacket
+@implementation DSTARFrame
 
-+ (DExtraDisconnectAckPacket *)packetFromData:(NSData *)data {
++ (DSTARFrame *)fromData:(NSData *)data {
     if ([data length] != 12)
         return nil;
     
     char packet[12];
+    
     [data getBytes:packet length:12];
-    NSString *disconnected = [[NSString alloc] initWithBytes:packet length:12 encoding:NSASCIIStringEncoding];
-    if (disconnected == nil || ![disconnected isEqualToString:@"DISCONNECTED"])
-        return nil;
+    NSData *dvcodec = [NSData dataWithBytes:&(packet[0]) length:9];
+    NSData *dvdata = [NSData dataWithBytes:&(packet[9]) length:3];
+    
+    return [[DSTARFrame alloc] initWithCodec:dvcodec
+                                        data:dvdata];
+}
 
-    return [[DExtraDisconnectAckPacket alloc] init];
+- (id)initWithCodec:(NSData *)codec
+               data:(NSData *)data {
+    if (self = [super init]) {
+        self.codec = codec;
+        self.data = data;
+    }
+    return self;
 }
 
 - (NSData *)toData {
-    char packet[] = {'D', 'I', 'S', 'C', 'O', 'N', 'N', 'E', 'C', 'T', 'E', 'D'};
+    char packet[12];
+    
+    [self.codec getBytes:&(packet[0]) length:9];
+    [self.data getBytes:&(packet[9]) length:3];
     
     return [NSData dataWithBytes:packet length:12];
 }
 
 - (NSString *)description {
-    return @"DExtraDisconnectAckPacket";
+    return [NSString stringWithFormat:@"DSTARFrame codec: %@ data: %@", self.codec, self.data];
 }
 
 @end

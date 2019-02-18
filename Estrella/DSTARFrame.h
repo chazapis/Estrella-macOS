@@ -1,5 +1,5 @@
 //
-// DExtraConnectPacket.h
+// DSTARFrame.h
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -19,21 +19,17 @@
 
 #import <Foundation/Foundation.h>
 
-@interface DExtraConnectPacket : NSObject
+@interface DSTARFrame : NSObject
 
-+ (DExtraConnectPacket *)packetFromData:(NSData *)data;
++ (DSTARFrame *)fromData:(NSData *)data;
 
-- (id)initWithSrcCallsign:(NSString *)srcCallsign
-                srcModule:(NSString *)srcModule
-               destModule:(NSString *)destModule
-                 revision:(unsigned char)revision;
+- (id)initWithCodec:(NSData *)codec
+               data:(NSData *)data;
 
 - (NSData *)toData;
 - (NSString *)description;
 
-@property(nonatomic, strong) NSString *srcCallsign;
-@property(nonatomic, strong) NSString *srcModule;
-@property(nonatomic, strong) NSString *destModule;
-@property(nonatomic, assign) unsigned char revision;
+@property(nonatomic, strong) NSData *codec;
+@property(nonatomic, strong) NSData *data;
 
 @end

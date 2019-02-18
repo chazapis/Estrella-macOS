@@ -23,13 +23,17 @@
 
 + (DExtraConnectAckPacket *)packetFromData:(NSData *)data;
 
-- (id)initWithSrcCallsign:(NSString *)srcCallsign srcModule:(NSString *)srcModule destModule:(NSString *)destModule revision:(NSInteger)revision;
+- (id)initWithSrcCallsign:(NSString *)srcCallsign
+                srcModule:(NSString *)srcModule
+               destModule:(NSString *)destModule
+                 revision:(unsigned char)revision;
+
 - (NSData *)toData;
-- (NSString *)toString;
+- (NSString *)description;
 
 @property(nonatomic, strong) NSString *srcCallsign;
 @property(nonatomic, strong) NSString *srcModule;
 @property(nonatomic, strong) NSString *destModule;
-@property(nonatomic, assign) NSInteger revision;
+@property(nonatomic, assign) unsigned char revision;
 
 @end

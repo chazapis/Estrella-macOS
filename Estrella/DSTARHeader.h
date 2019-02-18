@@ -1,5 +1,5 @@
 //
-// DExtraConnectPacket.h
+// DSTARHeader.h
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -19,21 +19,29 @@
 
 #import <Foundation/Foundation.h>
 
-@interface DExtraConnectPacket : NSObject
+@interface DSTARHeader : NSObject
 
-+ (DExtraConnectPacket *)packetFromData:(NSData *)data;
++ (DSTARHeader *)fromData:(NSData *)data;
 
-- (id)initWithSrcCallsign:(NSString *)srcCallsign
-                srcModule:(NSString *)srcModule
-               destModule:(NSString *)destModule
-                 revision:(unsigned char)revision;
+- (id)initWithFlag1:(unsigned char)flag1
+              flag2:(unsigned char)flag2
+              flag3:(unsigned char)flag3
+  repeater1Callsign:(NSString *)repeater1Callsign
+  repeater2Callsign:(NSString *)repeater2Callsign
+         urCallsign:(NSString *)urCallsign
+         myCallsign:(NSString *)myCallsign
+           mySuffix:(NSString *)mySuffix;
 
 - (NSData *)toData;
 - (NSString *)description;
 
-@property(nonatomic, strong) NSString *srcCallsign;
-@property(nonatomic, strong) NSString *srcModule;
-@property(nonatomic, strong) NSString *destModule;
-@property(nonatomic, assign) unsigned char revision;
+@property(nonatomic, assign) unsigned char flag1;
+@property(nonatomic, assign) unsigned char flag2;
+@property(nonatomic, assign) unsigned char flag3;
+@property(nonatomic, strong) NSString *repeater1Callsign;
+@property(nonatomic, strong) NSString *repeater2Callsign;
+@property(nonatomic, strong) NSString *urCallsign;
+@property(nonatomic, strong) NSString *myCallsign;
+@property(nonatomic, strong) NSString *mySuffix;
 
 @end

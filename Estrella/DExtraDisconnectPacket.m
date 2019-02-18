@@ -28,11 +28,11 @@
     char packet[11];
     
     [data getBytes:packet length:11];
-    NSString *destModule = [[NSString alloc] initWithBytes:&(packet[9]) length:1 encoding:NSUTF8StringEncoding];
+    NSString *destModule = [[NSString alloc] initWithBytes:&(packet[9]) length:1 encoding:NSASCIIStringEncoding];
     if (destModule == nil || ![destModule isEqualToString:@" "])
         return nil;
-    NSString *srcCallsign = [[NSString alloc] initWithBytes:&(packet[0]) length:8 encoding:NSUTF8StringEncoding];
-    NSString *srcModule = [[NSString alloc] initWithBytes:&(packet[8]) length:1 encoding:NSUTF8StringEncoding];
+    NSString *srcCallsign = [[NSString alloc] initWithBytes:&(packet[0]) length:8 encoding:NSASCIIStringEncoding];
+    NSString *srcModule = [[NSString alloc] initWithBytes:&(packet[8]) length:1 encoding:NSASCIIStringEncoding];
     if (srcCallsign == nil || srcModule == nil)
         return nil;
     srcCallsign = [srcCallsign stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -56,15 +56,15 @@
     NSString *paddedModule;
     
     paddedCallsign = [self.srcCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
-    [paddedCallsign getCString:&(packet[0]) maxLength:9 encoding:NSUTF8StringEncoding];
+    [paddedCallsign getCString:&(packet[0]) maxLength:9 encoding:NSASCIIStringEncoding];
     paddedModule = [self.srcCallsign stringByPaddingToLength:1 withString:@" " startingAtIndex:0];
-    [paddedModule getCString:&(packet[8]) maxLength:2 encoding:NSUTF8StringEncoding];
-    [@" " getCString:&(packet[9]) maxLength:2 encoding:NSUTF8StringEncoding];
+    [paddedModule getCString:&(packet[8]) maxLength:2 encoding:NSASCIIStringEncoding];
+    [@" " getCString:&(packet[9]) maxLength:2 encoding:NSASCIIStringEncoding];
 
     return [NSData dataWithBytes:packet length:11];
 }
 
-- (NSString *)toString {
+- (NSString *)description {
     return [NSString stringWithFormat:@"DExtraDisconnectPacket srcCallsign: %@ srcModule: %@", self.srcCallsign, self.srcModule];
 }
 

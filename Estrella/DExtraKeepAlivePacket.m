@@ -28,7 +28,7 @@
     char packet[9];
     
     [data getBytes:packet length:9];
-    NSString *srcCallsign = [[NSString alloc] initWithBytes:&(packet[0]) length:8 encoding:NSUTF8StringEncoding];
+    NSString *srcCallsign = [[NSString alloc] initWithBytes:&(packet[0]) length:8 encoding:NSASCIIStringEncoding];
     if (srcCallsign == nil)
         return nil;
     srcCallsign = [srcCallsign stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -48,12 +48,12 @@
     NSString *paddedCallsign;
     
     paddedCallsign = [self.srcCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
-    [paddedCallsign getCString:&(packet[0]) maxLength:9 encoding:NSUTF8StringEncoding];
+    [paddedCallsign getCString:&(packet[0]) maxLength:9 encoding:NSASCIIStringEncoding];
     
     return [NSData dataWithBytes:packet length:9];
 }
 
-- (NSString *)toString {
+- (NSString *)description {
     return [NSString stringWithFormat:@"DExtraKeepAlivePacket srcCallsign: %@", self.srcCallsign];
 }
 
