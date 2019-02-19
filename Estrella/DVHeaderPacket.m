@@ -69,8 +69,8 @@
     packet[10] = self.band2;
     packet[11] = self.band3;
     unsigned short streamId = NSSwapHostShortToLittle(self.streamId);
-    packet[12] = streamId & 0xFF;
-    packet[13] = ((streamId & 0xFF00) >> 8) & 0xFF;
+    packet[12] = streamId & 0xff;
+    packet[13] = ((streamId & 0xff00) >> 8) & 0xff;
     packet[14] = 0x80;
     [[self.dstarHeader toData] getBytes:&(packet[15]) length:41];
     

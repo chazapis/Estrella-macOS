@@ -19,6 +19,8 @@
 
 #import "DSTARHeader.h"
 
+#import "NSData+CRC.h"
+
 @implementation DSTARHeader
 
 + (DSTARHeader *)fromData:(NSData *)data {
@@ -43,8 +45,8 @@
     unsigned char flag1 = packet[0];
     unsigned char flag2 = packet[1];
     unsigned char flag3 = packet[2];
-    // unsigned short crc = packet[39] << 8 | packet[40];
-    
+    // unsigned short crc = packet[39] | (packet[40] << 8);
+
     return [[DSTARHeader alloc] initWithFlag1:flag1
                                         flag2:flag2
                                         flag3:flag3
@@ -95,8 +97,9 @@
     [paddedCallsign getCString:&(packet[27]) maxLength:9 encoding:NSASCIIStringEncoding];
     paddedSuffix = [self.mySuffix stringByPaddingToLength:4 withString:@" " startingAtIndex:0];
     [paddedSuffix getCString:&(packet[35]) maxLength:5 encoding:NSASCIIStringEncoding];
-    // packet[39] = ((crc & 0xFF00) >> 8) & 0xFF;
-    // packet[40] = crc & 0xFF;
+    unsigned short crc = [[NSData dataWithBytes:packet length:39] crc];
+    packet[39] = crc & 0xff;
+    packet[40] = ((crc & 0xff00) >> 8) & 0xff;
 
     return [NSData dataWithBytes:packet length:41];
 }

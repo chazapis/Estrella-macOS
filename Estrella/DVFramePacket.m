@@ -73,9 +73,9 @@
     packet[10] = self.band2;
     packet[11] = self.band3;
     unsigned short streamId = NSSwapHostShortToLittle(self.streamId);
-    packet[12] = streamId & 0xFF;
-    packet[13] = ((streamId & 0xFF00) >> 8) & 0xFF;
-    packet[15] = self.packetId;
+    packet[12] = streamId & 0xff;
+    packet[13] = ((streamId & 0xff00) >> 8) & 0xff;
+    packet[14] = self.packetId;
     [[self.dstarFrame toData] getBytes:&(packet[15]) length:12];
     
     return [NSData dataWithBytes:packet length:27];
