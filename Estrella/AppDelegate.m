@@ -20,6 +20,7 @@
 #import "AppDelegate.h"
 
 #import "DExtraClient.h"
+#import "DSTARHeader.h"
 
 @interface AppDelegate ()
 
@@ -28,7 +29,7 @@
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    
+
     // Initialize the server connection.
     self.dextraClient = [[DExtraClient alloc] init];
     [self.dextraClient connectToHost:@"192.168.56.10" port:30201 usingCallsign:@"SV9OAP"];

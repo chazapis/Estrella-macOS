@@ -22,7 +22,11 @@
 
 @interface DExtraClient : NSObject <GCDAsyncUdpSocketDelegate>
 
-- (void)connectToHost:(NSString *)host port:(NSInteger)port usingCallsign:(NSString *)callsign;
+- (void)connectToHost:(NSString *)host
+                 port:(NSInteger)port
+             callsign:(NSString *)reflectorCallsign
+               module:(NSString *)reflectorModule
+        usingCallsign:(NSString *)userCallsign;
 - (void)disconnect;
 
 @end
