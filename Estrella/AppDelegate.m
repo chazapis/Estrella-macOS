@@ -32,7 +32,11 @@
 
     // Initialize the server connection.
     self.dextraClient = [[DExtraClient alloc] init];
-    [self.dextraClient connectToHost:@"192.168.56.10" port:30201 usingCallsign:@"SV9OAP"];
+    [self.dextraClient connectToHost:@"192.168.56.10"
+                                port:30201
+                            callsign:@"ORF999"
+                              module:@"B"
+                       usingCallsign:@"SV9OAP"];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
