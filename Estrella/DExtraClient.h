@@ -20,13 +20,41 @@
 #import <Foundation/Foundation.h>
 #import <CocoaAsyncSocket/GCDAsyncUdpSocket.h>
 
+typedef NS_ENUM(NSInteger, DExtraClientStatus) {
+    DExtraClientStatusIdle,             // Not connected
+    DExtraClientStatusConnecting,       // In the process of connecting
+    DExtraClientStatusConnected,        // Connected (normal operation)
+    DExtraClientStatusFailed,           // Connection failed
+    DExtraClientStatusDisconnecting,    // In the process of disconnecting
+    DExtraClientStatusLost              // Connection lost and will try to reconnect
+};
+
+@class DExtraClient;
+
+@protocol DExtraClientDelegate <NSObject>
+
+- (void)dextraClient:(DExtraClient *)client didChangeStatusTo:(NSInteger)status;
+
+@end
+
 @interface DExtraClient : NSObject <GCDAsyncUdpSocketDelegate>
 
-- (void)connectToHost:(NSString *)host
-                 port:(NSInteger)port
-             callsign:(NSString *)reflectorCallsign
-               module:(NSString *)reflectorModule
-        usingCallsign:(NSString *)userCallsign;
+- (id)initWithHost:(NSString *)host
+              port:(NSInteger)port
+          callsign:(NSString *)reflectorCallsign
+            module:(NSString *)reflectorModule
+     usingCallsign:(NSString *)userCallsign;
+
+- (void)connect;
 - (void)disconnect;
+
+@property (nonatomic, weak) id <DExtraClientDelegate> delegate;
+@property (nonatomic, assign, readonly) DExtraClientStatus status;
+
+@property (nonatomic, strong, readonly) NSString *host;
+@property (nonatomic, assign, readonly) NSInteger port;
+@property (nonatomic, strong, readonly) NSString *reflectorCallsign;
+@property (nonatomic, strong, readonly) NSString *reflectorModule;
+@property (nonatomic, strong, readonly) NSString *userCallsign;
 
 @end
