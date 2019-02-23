@@ -33,7 +33,7 @@ typedef NS_ENUM(NSInteger, DExtraClientStatus) {
 
 @protocol DExtraClientDelegate <NSObject>
 
-- (void)dextraClient:(DExtraClient *)client didChangeStatusTo:(NSInteger)status;
+- (void)dextraClient:(DExtraClient *)client didChangeStatusTo:(DExtraClientStatus)status;
 
 @end
 

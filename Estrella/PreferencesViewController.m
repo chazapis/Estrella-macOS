@@ -1,5 +1,5 @@
 //
-// ViewController.h
+// PreferencesViewController.m
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -17,8 +17,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#import <Cocoa/Cocoa.h>
+#import "PreferencesViewController.h"
 
-@interface ViewController : NSViewController
+@implementation PreferencesViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    // XXX: Cycle through elements does not work for some reason...
+    [[[self view] window] setInitialFirstResponder:self.connectButton];
+}
+- (IBAction)connectPressed:(id)sender {
+    [self dismissController:self];
+}
 
 @end

@@ -1,5 +1,5 @@
 //
-// ViewController.m
+// ConnectionViewController.h
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -17,20 +17,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#import "ViewController.h"
+#import <Cocoa/Cocoa.h>
 
-@implementation ViewController
+#import "DExtraClient.h"
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
+@interface ConnectionViewController : NSViewController <DExtraClientDelegate>
 
-    // Do any additional setup after loading the view.
-}
+- (IBAction)showPreferences:(id)sender;
 
-- (void)setRepresentedObject:(id)representedObject {
-    [super setRepresentedObject:representedObject];
+@property (nonatomic, strong) DExtraClient *dextraClient;
 
-    // Update the view, if already loaded.
-}
+@property (nonatomic, weak) IBOutlet NSViewController *preferencesViewController;
 
 @end

@@ -19,10 +19,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class DExtraClient;
-
 @interface AppDelegate : NSObject <NSApplicationDelegate>
-
-@property (nonatomic, strong) DExtraClient *dextraClient;
 
 @end

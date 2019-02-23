@@ -1,5 +1,5 @@
 //
-// AppDelegate.m
+// PreferencesViewController.h
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -17,23 +17,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#import "AppDelegate.h"
+#import <Cocoa/Cocoa.h>
 
-#import "DExtraClient.h"
-#import "DSTARHeader.h"
+@interface PreferencesViewController : NSViewController
 
-@interface AppDelegate ()
+- (IBAction)connectPressed:(id)sender;
 
-@end
-
-@implementation AppDelegate
-
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-
-}
-
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
-
-}
+@property (nonatomic, weak) IBOutlet NSButton *connectButton;
 
 @end
