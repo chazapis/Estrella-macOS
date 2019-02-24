@@ -110,7 +110,7 @@ typedef NS_ENUM(NSInteger, DExtraPacketTag) {
         return;
     }
 
-    // XXX: need a thread or timer to handle reconnects (start after socket is initialized)
+    // XXX: Need a thread or timer to handle reconnects (start after socket is initialized)...
 
     DExtraConnectPacket *connectPacket = [[DExtraConnectPacket alloc] initWithSrcCallsign:self.userCallsign
                                                                                 srcModule:@""

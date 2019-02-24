@@ -24,10 +24,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // XXX: Cycle through elements does not work for some reason...
-    [[[self view] window] setInitialFirstResponder:self.connectButton];
 }
-- (IBAction)connectPressed:(id)sender {
+
+- (void)viewWillAppear {
+    // XXX: Cycle through elements does not work for some reason...
+//    [[[self view] window] setInitialFirstResponder:self.applyButton];
+}
+
+- (IBAction)applyPressed:(id)sender {
+    [self dismissController:self];
+}
+
+#pragma mark NSResponder
+
+- (void)cancelOperation:(id)sender {
     [self dismissController:self];
 }
 

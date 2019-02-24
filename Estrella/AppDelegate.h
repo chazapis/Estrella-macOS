@@ -21,4 +21,7 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
+- (NSDictionary *)preferencesForConnectionAtPosition:(NSInteger)position;
+- (void)savePreferences:(NSDictionary *)preferences forConnectionAtPosition:(NSInteger)position;
+
 @end

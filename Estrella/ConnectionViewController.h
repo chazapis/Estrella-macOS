@@ -20,13 +20,10 @@
 #import <Cocoa/Cocoa.h>
 
 #import "DExtraClient.h"
+#import "PreferencesViewController.h"
 
-@interface ConnectionViewController : NSViewController <DExtraClientDelegate>
+@interface ConnectionViewController : NSViewController <DExtraClientDelegate, PreferencesViewControllerDelegate>
 
 - (IBAction)showPreferences:(id)sender;
-
-@property (nonatomic, strong) DExtraClient *dextraClient;
-
-@property (nonatomic, weak) IBOutlet NSViewController *preferencesViewController;
 
 @end

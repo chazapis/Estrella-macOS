@@ -19,10 +19,24 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class PreferencesViewController;
+
+@protocol PreferencesViewControllerDelegate <NSObject>
+
+- (void)applyChangesFromPreferencesViewController:(PreferencesViewController *)preferencesViewController;
+
+@end
+
 @interface PreferencesViewController : NSViewController
 
-- (IBAction)connectPressed:(id)sender;
+- (IBAction)applyPressed:(id)sender;
 
-@property (nonatomic, weak) IBOutlet NSButton *connectButton;
+@property (nonatomic, weak) id <PreferencesViewControllerDelegate> delegate;
+
+@property (nonatomic, weak) IBOutlet NSTextField *userCallsignTextField;
+@property (nonatomic, weak) IBOutlet NSTextField *reflectorCallsignTextField;
+@property (nonatomic, weak) IBOutlet NSTextField *reflectorHostTextField;
+@property (nonatomic, weak) IBOutlet NSButton *connectAutomaticallyButton;
+@property (nonatomic, weak) IBOutlet NSButton *applyButton;
 
 @end

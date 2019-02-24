@@ -29,11 +29,30 @@
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-
+    if ([[NSUserDefaults standardUserDefaults] arrayForKey:@"Connections"] == nil) {
+        NSDictionary *defaultPreferences = @{@"UserCallsign": @"",
+                                             @"ReflectorCallsign": @"",
+                                             @"ReflectorHost": @"",
+                                             @"ConnectAutomatically": @NO};
+        [[NSUserDefaults standardUserDefaults] setObject:@[defaultPreferences] forKey:@"Connections"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
+    // XXX: Close all connections...
+}
 
+- (NSDictionary *)preferencesForConnectionAtPosition:(NSInteger)position {
+    NSArray *connectionsPreferences = [[NSUserDefaults standardUserDefaults] arrayForKey:@"Connections"];
+    return connectionsPreferences[position];
+}
+
+- (void)savePreferences:(NSDictionary *)preferences forConnectionAtPosition:(NSInteger)position {
+    NSMutableArray *connectionsPreferences = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] arrayForKey:@"Connections"]];
+    connectionsPreferences[position] = preferences;
+    [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:connectionsPreferences] forKey:@"Connections"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 @end
