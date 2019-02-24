@@ -36,11 +36,15 @@ typedef NS_ENUM(NSInteger, DExtraPacketTag) {
 
 @interface DExtraClient ()
 
-- (void)connect;
+- (void)ensureConnected:(NSTimer *)timer;
+- (void)ensureDisonnected:(NSTimer *)timer;
 
 @property (nonatomic, assign) DExtraClientStatus status;
 @property (nonatomic, strong) GCDAsyncUdpSocket *socket;
 @property (atomic, strong) NSDate *lastHeard;
+
+@property (nonatomic, strong) NSTimer *connectTimer;
+@property (nonatomic, strong) NSTimer *disconnectTimer;
 
 @property (nonatomic, strong) NSString *host;
 @property (nonatomic, assign) NSInteger port;
@@ -60,6 +64,7 @@ typedef NS_ENUM(NSInteger, DExtraPacketTag) {
     if ((self = [super init])) {
         _delegate = nil;
         _status = DExtraClientStatusIdle;
+        _socket = nil;
 
         self.host = host;
         self.port = port;
@@ -71,6 +76,11 @@ typedef NS_ENUM(NSInteger, DExtraPacketTag) {
     return self;
 }
 
+- (void)dealloc {
+    if (self.socket)
+        [self.socket close];
+}
+
 // Custom property, so the same protection mechanism can be used by other internal functions
 @synthesize status = _status;
 
@@ -78,8 +88,7 @@ typedef NS_ENUM(NSInteger, DExtraPacketTag) {
     @synchronized (self) {
         _status = status;
     }
-    if (_delegate != nil)
-        [_delegate dextraClient:self didChangeStatusTo:status];
+    [self.delegate dextraClient:self didChangeStatusTo:status];
 }
 
 - (DExtraClientStatus)status {
@@ -95,6 +104,7 @@ typedef NS_ENUM(NSInteger, DExtraPacketTag) {
         
         _status = DExtraClientStatusConnecting;
     }
+    [self.delegate dextraClient:self didChangeStatusTo:DExtraClientStatusConnecting];
 
     self.socket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     [self.socket setPreferIPv4];
@@ -102,35 +112,71 @@ typedef NS_ENUM(NSInteger, DExtraPacketTag) {
     NSError *error = nil;
     
     if (![self.socket bindToPort:0 error:&error] || ![self.socket beginReceiving:&error]) {
-        NSLog(@"DExtraClient: Error binding or reveiving on socket: %@", error);
+        NSLog(@"DExtraClient: Error binding or receiving on socket: %@", error);
+        BOOL statusChanged = NO;
         @synchronized (self) {
-            if (_status == DExtraClientStatusConnecting)
+            if (_status == DExtraClientStatusConnecting) {
                 _status = DExtraClientStatusFailed;
+                statusChanged = YES;
+            }
         }
+        if (statusChanged)
+            [self.delegate dextraClient:self didChangeStatusTo:DExtraClientStatusFailed];
         return;
     }
-
-    // XXX: Need a thread or timer to handle reconnects (start after socket is initialized)...
 
     DExtraConnectPacket *connectPacket = [[DExtraConnectPacket alloc] initWithSrcCallsign:self.userCallsign
                                                                                 srcModule:@""
                                                                                destModule:self.reflectorModule
                                                                                  revision:1];
     [self.socket sendData:[connectPacket toData] toHost:self.host port:self.port withTimeout:3 tag:DExtraPacketTagConnect];
+    if (self.connectTimer)
+        [self.connectTimer invalidate];
+    self.connectTimer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(ensureConnected:) userInfo:nil repeats:NO];
     NSLog(@"DExtraClient: Sent packet with data: %@", [connectPacket toData]);
 }
 
 - (void)disconnect {
     @synchronized (self) {
-        if (_status == DExtraClientStatusIdle || _status == DExtraClientStatusDisconnecting)
+        if (_status != DExtraClientStatusConnected)
             return;
         
         _status = DExtraClientStatusDisconnecting;
     }
-    
+    [self.delegate dextraClient:self didChangeStatusTo:DExtraClientStatusDisconnecting];
+
     DExtraDisconnectPacket *disconnectPacket = [[DExtraDisconnectPacket alloc] initWithSrcCallsign:self.userCallsign srcModule:@""];
     [self.socket sendData:[disconnectPacket toData] toHost:self.host port:self.port withTimeout:3 tag:DExtraPacketTagDisconnect];
+    if (self.disconnectTimer)
+        [self.disconnectTimer invalidate];
+    self.disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(ensureDisonnected:) userInfo:nil repeats:NO];
     NSLog(@"DExtraClient: Sent packet with data: %@", [disconnectPacket toData]);
+}
+
+- (void)ensureConnected:(NSTimer *)timer {
+    NSLog(@"DExtraClient: Checking if connect succeeded");
+    BOOL statusChanged = NO;
+    @synchronized (self) {
+        if (_status == DExtraClientStatusConnecting) {
+            _status = DExtraClientStatusFailed;
+            statusChanged = YES;
+        }
+    }
+    if (statusChanged)
+        [self.delegate dextraClient:self didChangeStatusTo:DExtraClientStatusFailed];
+}
+
+- (void)ensureDisonnected:(NSTimer *)timer {
+    NSLog(@"DExtraClient: Checking if disconnect succeeded");
+    BOOL statusChanged = NO;
+    @synchronized (self) {
+        if (_status == DExtraClientStatusDisconnecting) {
+            _status = DExtraClientStatusIdle;
+            statusChanged = YES;
+        }
+    }
+    if (statusChanged)
+        [self.delegate dextraClient:self didChangeStatusTo:DExtraClientStatusIdle];
 }
 
 #pragma mark GCDAsyncUdpSocketDelegate
@@ -138,10 +184,15 @@ typedef NS_ENUM(NSInteger, DExtraPacketTag) {
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *)error {
     NSLog(@"DExtraClient: Could not send data with tag: %ld error: %@", tag, [error localizedDescription]);
     if (tag == DExtraPacketTagConnect) {
+        BOOL statusChanged = NO;
         @synchronized (self) {
-            if (_status == DExtraClientStatusConnecting)
+            if (_status == DExtraClientStatusConnecting) {
                 _status = DExtraClientStatusLost;
+                statusChanged = YES;
+            }
         }
+        if (statusChanged)
+            [self.delegate dextraClient:self didChangeStatusTo:DExtraClientStatusLost];
     }
 }
 
@@ -169,25 +220,54 @@ withFilterContext:(id)filterContext {
     if ([packet isKindOfClass:[DVFramePacket class]] || [packet isKindOfClass:[DVHeaderPacket class]]) {
         return;
     }
-    if ([packet isKindOfClass:[DExtraConnectAckPacket class]]) {
+    if ([packet isKindOfClass:[DExtraKeepAlivePacket class]]) {
         DExtraKeepAlivePacket *keepAlivePacket = [[DExtraKeepAlivePacket alloc] initWithSrcCallsign:self.userCallsign];
         [self.socket sendData:[keepAlivePacket toData] toHost:self.host port:self.port withTimeout:3 tag:DExtraPacketTagKeepAlive];
         NSLog(@"DExtraClient: Exchanged keep alive packets");
         return;
     }
 
+    BOOL statusChanged = NO;
+    DExtraClientStatus newStatus;
+    BOOL invalidateConnectTimer = NO;
+    BOOL invalidateDisconnectTimer = NO;
+
     @synchronized (self) {
         if ([packet isKindOfClass:[DExtraConnectAckPacket class]]) {
-            if (_status == DExtraClientStatusConnecting)
+            if (_status == DExtraClientStatusConnecting) {
                 _status = DExtraClientStatusConnected;
+                invalidateConnectTimer = YES;
+                statusChanged = YES;
+            }
         } else if ([packet isKindOfClass:[DExtraConnectNackPacket class]]) {
-            if (_status == DExtraClientStatusConnecting)
+            if (_status == DExtraClientStatusConnecting) {
                 _status = DExtraClientStatusFailed;
+                invalidateConnectTimer = YES;
+                statusChanged = YES;
+            }
         } else if ([packet isKindOfClass:[DExtraDisconnectPacket class]]) {
             _status = DExtraClientStatusIdle;
+            statusChanged = YES;
         } else if ([packet isKindOfClass:[DExtraDisconnectAckPacket class]]) {
-            _status = DExtraClientStatusIdle;
+            if (_status == DExtraClientStatusDisconnecting) {
+                _status = DExtraClientStatusIdle;
+                invalidateDisconnectTimer = YES;
+                statusChanged = YES;
+            }
         }
+        newStatus = _status;
+    }
+    if (statusChanged)
+        [self.delegate dextraClient:self didChangeStatusTo:newStatus];
+    if (invalidateConnectTimer) {
+        if (self.connectTimer)
+            [self.connectTimer invalidate];
+        self.connectTimer = nil;
+    }
+    if (invalidateDisconnectTimer) {
+        if (self.disconnectTimer)
+            [self.disconnectTimer invalidate];
+        self.disconnectTimer = nil;
     }
 }
 

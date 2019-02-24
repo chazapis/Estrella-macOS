@@ -35,14 +35,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.dextraClient = nil;
+
     // Get preferences
     NSArray *connectionsPreferences = [[NSUserDefaults standardUserDefaults] arrayForKey:@"Connections"];
     self.connectionPreferences = connectionsPreferences[0]; // Only one connection for now
     NSLog(@"ConnectionViewController: Loaded with userCallsign: %@ reflectorCallsign: %@ reflectorModule: %@ reflectorHost: %@ connectAutomatically: %@", self.connectionPreferences[@"UserCallsign"], self.connectionPreferences[@"ReflectorCallsign"], self.connectionPreferences[@"ReflectorModule"],  self.connectionPreferences[@"ReflectorHost"], self.connectionPreferences[@"ConnectAutomatically"]);
 
     // XXX: Check for callsign and address validity...
-    // XXX: Split reflector callsign and module...
-    
 }
 
 - (void)viewDidAppear {
@@ -84,6 +84,21 @@
 
 - (void)dextraClient:(DExtraClient *)client didChangeStatusTo:(DExtraClientStatus)status {
     NSLog(@"ConnectionViewController: Connection status changed to: %ld", status);
+    switch (status) {
+        case DExtraClientStatusIdle:
+            // Disconnected
+            [self connect];
+            break;
+        case DExtraClientStatusFailed:
+        case DExtraClientStatusLost:
+            // Wait a while before trying to reconnect
+            [self performSelector:@selector(connect) withObject:nil afterDelay:3];
+            break;
+        case DExtraClientStatusConnecting:
+        case DExtraClientStatusConnected:
+        case DExtraClientStatusDisconnecting:
+            break;
+    }
 }
 
 # pragma mark PreferencesViewControllerDelegate
@@ -98,18 +113,25 @@
 
 - (void)applyChangesFromPreferencesViewController:(PreferencesViewController *)preferencesViewController {
     NSLog(@"ConnectionViewController: Connection preferences changed");
-
+    
     NSString *userCallsign = preferencesViewController.userCallsignTextField.stringValue;
     NSString *reflectorCallsign = preferencesViewController.reflectorCallsignTextField.stringValue;
     NSString *reflectorModule = preferencesViewController.reflectorModuleTextField.stringValue;
     NSString *reflectorHost = preferencesViewController.reflectorHostTextField.stringValue;
     BOOL connectAutomatically = preferencesViewController.connectAutomaticallyButton.state;
-    
+
+    BOOL shouldReconnect = NO;
+    BOOL shouldSave = NO;
+
     if (![self.connectionPreferences[@"UserCallsign"] isEqualToString:userCallsign] ||
         ![self.connectionPreferences[@"ReflectorCallsign"] isEqualToString:reflectorCallsign] ||
         ![self.connectionPreferences[@"ReflectorModule"] isEqualToString:reflectorModule] ||
-        ![self.connectionPreferences[@"ReflectorHost"] isEqualToString:reflectorHost] ||
-        [self.connectionPreferences[@"ConnectAutomatically"] boolValue] != connectAutomatically) {
+        ![self.connectionPreferences[@"ReflectorHost"] isEqualToString:reflectorHost])
+        shouldReconnect = YES;
+    if (shouldReconnect || [self.connectionPreferences[@"ConnectAutomatically"] boolValue] != connectAutomatically)
+        shouldSave = YES;
+
+    if (shouldSave) {
         self.connectionPreferences = @{@"UserCallsign": userCallsign,
                                        @"ReflectorCallsign": reflectorCallsign,
                                        @"ReflectorHost": reflectorHost,
@@ -119,6 +141,13 @@
         connectionsPreferences[0] = self.connectionPreferences; // Only one connection for now
         [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:connectionsPreferences] forKey:@"Connections"];
         [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    if (shouldReconnect) {
+        if (self.dextraClient == nil) {
+            [self connect];
+        } else {
+            [self disconnect];
+        }
     }
 }
 
