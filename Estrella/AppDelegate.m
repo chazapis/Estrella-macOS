@@ -33,6 +33,7 @@
         NSDictionary *defaultPreferences = @{@"UserCallsign": @"",
                                              @"ReflectorCallsign": @"",
                                              @"ReflectorHost": @"",
+                                             @"ReflectorModule": @"",
                                              @"ConnectAutomatically": @NO};
         [[NSUserDefaults standardUserDefaults] setObject:@[defaultPreferences] forKey:@"Connections"];
         [[NSUserDefaults standardUserDefaults] synchronize];

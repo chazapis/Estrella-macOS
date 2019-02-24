@@ -903,6 +903,7 @@
                         <outlet property="connectAutomaticallyButton" destination="OUK-l6-kmV" id="jjh-BI-i6D"/>
                         <outlet property="reflectorCallsignTextField" destination="Jva-0t-tej" id="RBc-jg-dgC"/>
                         <outlet property="reflectorHostTextField" destination="90q-PC-DDg" id="N6j-pg-f25"/>
+                        <outlet property="reflectorModuleTextField" destination="GxG-z5-XL9" id="K0B-pi-8dv"/>
                         <outlet property="userCallsignTextField" destination="ujM-gg-jrq" id="hgC-Yn-7Cn"/>
                     </connections>
                 </viewController>

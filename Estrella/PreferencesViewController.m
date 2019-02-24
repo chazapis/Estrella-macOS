@@ -23,7 +23,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    [self.delegate fillInPreferencesViewController:self];
 }
 
 - (void)viewWillAppear {
@@ -32,6 +33,7 @@
 }
 
 - (IBAction)applyPressed:(id)sender {
+    [self.delegate applyChangesFromPreferencesViewController:self];
     [self dismissController:self];
 }
 

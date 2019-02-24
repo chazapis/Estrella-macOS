@@ -23,6 +23,7 @@
 
 @protocol PreferencesViewControllerDelegate <NSObject>
 
+- (void)fillInPreferencesViewController:(PreferencesViewController *)preferencesViewController;
 - (void)applyChangesFromPreferencesViewController:(PreferencesViewController *)preferencesViewController;
 
 @end
@@ -35,6 +36,7 @@
 
 @property (nonatomic, weak) IBOutlet NSTextField *userCallsignTextField;
 @property (nonatomic, weak) IBOutlet NSTextField *reflectorCallsignTextField;
+@property (nonatomic, weak) IBOutlet NSTextField *reflectorModuleTextField;
 @property (nonatomic, weak) IBOutlet NSTextField *reflectorHostTextField;
 @property (nonatomic, weak) IBOutlet NSButton *connectAutomaticallyButton;
 @property (nonatomic, weak) IBOutlet NSButton *applyButton;
