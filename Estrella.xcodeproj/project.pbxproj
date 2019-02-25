@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E27B9D032223D3CF009C94F0 /* CallsignFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = E27B9D022223D3CF009C94F0 /* CallsignFormatter.m */; };
+		E27B9D062223D3E3009C94F0 /* ModuleFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = E27B9D052223D3E3009C94F0 /* ModuleFormatter.m */; };
 		E27CA6162219224F00600899 /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27CA6152219224F00600899 /* CocoaAsyncSocket.framework */; };
 		E27CA6172219224F00600899 /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E27CA6152219224F00600899 /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E27CA61B221922CF00600899 /* CocoaAsyncSocket.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E27CA61A221922CF00600899 /* CocoaAsyncSocket.framework.dSYM */; };
@@ -55,6 +57,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E27B9D012223D3CF009C94F0 /* CallsignFormatter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallsignFormatter.h; sourceTree = "<group>"; };
+		E27B9D022223D3CF009C94F0 /* CallsignFormatter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CallsignFormatter.m; sourceTree = "<group>"; };
+		E27B9D042223D3E3009C94F0 /* ModuleFormatter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModuleFormatter.h; sourceTree = "<group>"; };
+		E27B9D052223D3E3009C94F0 /* ModuleFormatter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModuleFormatter.m; sourceTree = "<group>"; };
 		E27CA6152219224F00600899 /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaAsyncSocket.framework; path = Carthage/Build/Mac/CocoaAsyncSocket.framework; sourceTree = "<group>"; };
 		E27CA61A221922CF00600899 /* CocoaAsyncSocket.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = CocoaAsyncSocket.framework.dSYM; path = Carthage/Build/Mac/CocoaAsyncSocket.framework.dSYM; sourceTree = "<group>"; };
 		E27CA61C2219264800600899 /* DExtraClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DExtraClient.h; sourceTree = "<group>"; };
@@ -107,6 +113,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E27B9D002223D3A8009C94F0 /* Formatters */ = {
+			isa = PBXGroup;
+			children = (
+				E27B9D012223D3CF009C94F0 /* CallsignFormatter.h */,
+				E27B9D022223D3CF009C94F0 /* CallsignFormatter.m */,
+				E27B9D042223D3E3009C94F0 /* ModuleFormatter.h */,
+				E27B9D052223D3E3009C94F0 /* ModuleFormatter.m */,
+			);
+			name = Formatters;
+			sourceTree = "<group>";
+		};
 		E27CA6182219225300600899 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -165,6 +182,7 @@
 		E292C0B022153899009FE9A9 /* Estrella */ = {
 			isa = PBXGroup;
 			children = (
+				E27B9D002223D3A8009C94F0 /* Formatters */,
 				E27CA6222219EB8300600899 /* Packets */,
 				E27CA61C2219264800600899 /* DExtraClient.h */,
 				E27CA61D2219264800600899 /* DExtraClient.m */,
@@ -267,11 +285,13 @@
 				E292C0B622153899009FE9A9 /* ConnectionViewController.m in Sources */,
 				E27CA6282219F5D200600899 /* DExtraConnectNackPacket.m in Sources */,
 				E27CA6472221DDEC00600899 /* PreferencesViewController.m in Sources */,
+				E27B9D032223D3CF009C94F0 /* CallsignFormatter.m in Sources */,
 				E27CA642221BDB3400600899 /* NSData+CRC.m in Sources */,
 				E27CA63A221AAD4500600899 /* DSTARHeader.m in Sources */,
 				E292C0BE2215389B009FE9A9 /* main.m in Sources */,
 				E27CA62B2219F66200600899 /* DExtraDisconnectPacket.m in Sources */,
 				E27CA6252219F42B00600899 /* DExtraConnectAckPacket.m in Sources */,
+				E27B9D062223D3E3009C94F0 /* ModuleFormatter.m in Sources */,
 				E27CA634221A913000600899 /* DVHeaderPacket.m in Sources */,
 				E27CA63D221AAD8C00600899 /* DSTARFrame.m in Sources */,
 				E292C0B322153899009FE9A9 /* AppDelegate.m in Sources */,

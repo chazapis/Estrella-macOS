@@ -25,11 +25,7 @@
     [super viewDidLoad];
 
     [self.delegate fillInPreferencesViewController:self];
-}
 
-- (void)viewWillAppear {
-    // XXX: Cycle through elements does not work for some reason...
-//    [[[self view] window] setInitialFirstResponder:self.applyButton];
 }
 
 - (IBAction)applyPressed:(id)sender {
@@ -40,6 +36,10 @@
 #pragma mark NSResponder
 
 - (void)cancelOperation:(id)sender {
+    [self dismissController:self];
+}
+
+- (void)complete:(id)sender {
     [self dismissController:self];
 }
 

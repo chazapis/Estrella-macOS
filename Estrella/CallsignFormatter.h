@@ -1,5 +1,5 @@
 //
-// AppDelegate.m
+// CallsignFormatter.h
 //
 // Copyright (C) 2019 Antony Chazapis SV9OAN
 //
@@ -17,21 +17,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#import "AppDelegate.h"
+#import <Foundation/Foundation.h>
 
-#import "DExtraClient.h"
-#import "DSTARHeader.h"
-
-@interface AppDelegate ()
-
-@end
-
-@implementation AppDelegate
-
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-}
-
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
-}
+@interface CallsignFormatter : NSFormatter
 
 @end

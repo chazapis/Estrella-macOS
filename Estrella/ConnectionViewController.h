@@ -26,4 +26,11 @@
 
 - (IBAction)showPreferences:(id)sender;
 
+@property (nonatomic, weak) IBOutlet NSTextField *line1TextField;
+@property (nonatomic, weak) IBOutlet NSTextField *line2TextField;
+@property (nonatomic, weak) IBOutlet NSTextField *line3TextField;
+@property (nonatomic, weak) IBOutlet NSTextField *line4TextField;
+@property (nonatomic, weak) IBOutlet NSButton *statusButton;
+@property (nonatomic, weak) IBOutlet NSButton *pttButton;
+
 @end
