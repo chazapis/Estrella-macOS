@@ -29,6 +29,8 @@ typedef NS_ENUM(NSInteger, DExtraClientStatus) {
     DExtraClientStatusLost              // Connection lost and will try to reconnect
 };
 
+NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status);
+
 @class DExtraClient;
 
 @protocol DExtraClientDelegate <NSObject>

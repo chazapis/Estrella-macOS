@@ -34,6 +34,23 @@ typedef NS_ENUM(NSInteger, DExtraPacketTag) {
     DExtraPacketTagKeepAlive
 };
 
+NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
+    switch (status) {
+        case DExtraClientStatusIdle:
+            return @"Idle";
+        case DExtraClientStatusConnecting:
+            return @"Connecting";
+        case DExtraClientStatusConnected:
+            return @"Connected";
+        case DExtraClientStatusFailed:
+            return @"Failed";
+        case DExtraClientStatusDisconnecting:
+            return @"Disconnected";
+        case DExtraClientStatusLost:
+            return @"Lost";
+    }
+}
+
 @interface DExtraClient ()
 
 - (void)ensureConnected:(NSTimer *)timer;

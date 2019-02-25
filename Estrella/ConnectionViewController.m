@@ -100,17 +100,18 @@
 
 - (void)connect {
     NSLog(@"ConnectionViewController: Connect to reflector");
-//    self.dextraClient = [[DExtraClient alloc] initWithHost:self.reflectorHost
-//                                                      port:30201
-//                                                  callsign:self.reflectorCallsign
-//                                                    module:self.reflectorModule
-//                                             usingCallsign:self.userCallsign];
-//    [self.dextraClient connect];
+    self.dextraClient = [[DExtraClient alloc] initWithHost:self.reflectorHost
+                                                      port:30201
+                                                  callsign:self.reflectorCallsign
+                                                    module:self.reflectorModule
+                                             usingCallsign:self.userCallsign];
+    self.dextraClient.delegate = self;
+    [self.dextraClient connect];
 }
 
 - (void)disconnect {
     NSLog(@"ConnectionViewController: Disconnect from reflector");
-//    [self.dextraClient disconnect];
+    [self.dextraClient disconnect];
 }
 
 - (void)loadConnectionPreferences:(NSDictionary *)connectionPreferences {
@@ -161,7 +162,7 @@
 # pragma mark DExtraClientDelegate
 
 - (void)dextraClient:(DExtraClient *)client didChangeStatusTo:(DExtraClientStatus)status {
-    NSLog(@"ConnectionViewController: Connection status changed to: %ld", status);
+    NSLog(@"ConnectionViewController: Connection status changed to: %@", NSStringFromDExtraClientStatus(status));
     switch (status) {
         case DExtraClientStatusIdle:
             // Disconnected
@@ -208,6 +209,7 @@
         shouldReconnect = YES;
     if (shouldReconnect || self.connectAutomatically != connectAutomatically)
         shouldSave = YES;
+    NSLog(@"ConnectionViewController: shouldReconnect: %hhu shouldSave: %hhu", shouldReconnect, shouldSave);
 
     if (shouldSave) {
         NSDictionary *connectionPreferences = @{@"UserCallsign": userCallsign,
@@ -221,12 +223,10 @@
         [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:connectionsPreferences] forKey:@"Connections"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    if (shouldReconnect) {
-        if (self.dextraClient) {
-            [self disconnect];
-        } else {
-            [self connect];
-        }
+    if (!self.dextraClient) {
+        [self connect];
+    } else if (shouldReconnect) {
+        [self disconnect];
     }
 }
 
