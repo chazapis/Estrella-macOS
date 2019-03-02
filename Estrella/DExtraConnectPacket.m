@@ -65,7 +65,7 @@
 
     paddedCallsign = [self.srcCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
     [paddedCallsign getCString:&(packet[0]) maxLength:9 encoding:NSASCIIStringEncoding];
-    paddedModule = [self.srcCallsign stringByPaddingToLength:1 withString:@" " startingAtIndex:0];
+    paddedModule = [self.srcModule stringByPaddingToLength:1 withString:@" " startingAtIndex:0];
     [paddedModule getCString:&(packet[8]) maxLength:2 encoding:NSASCIIStringEncoding];
     paddedModule = [self.destModule stringByPaddingToLength:1 withString:@" " startingAtIndex:0];
     [paddedModule getCString:&(packet[9]) maxLength:2 encoding:NSASCIIStringEncoding];

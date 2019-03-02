@@ -60,6 +60,7 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
 @property (nonatomic, strong) GCDAsyncUdpSocket *socket;
 @property (atomic, strong) NSDate *lastHeard;
 
+@property (nonatomic, strong) NSTimer *timeoutTimer;
 @property (nonatomic, strong) NSTimer *connectTimer;
 @property (nonatomic, strong) NSTimer *disconnectTimer;
 
@@ -82,6 +83,9 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
         _delegate = nil;
         _status = DExtraClientStatusIdle;
         _socket = nil;
+        _lastHeard = nil;
+        
+        _timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(ensureAlive:) userInfo:nil repeats:YES];
 
         self.host = host;
         self.port = port;
@@ -96,6 +100,12 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
 - (void)dealloc {
     if (self.socket)
         [self.socket close];
+    if (self.timeoutTimer)
+        [self.timeoutTimer invalidate];
+    if (self.connectTimer)
+        [self.connectTimer invalidate];
+    if (self.disconnectTimer)
+        [self.disconnectTimer invalidate];
 }
 
 // Custom property, so the same protection mechanism can be used by other internal functions
@@ -170,6 +180,23 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
     NSLog(@"DExtraClient: Sent packet with data: %@", [disconnectPacket toData]);
 }
 
+- (void)ensureAlive:(NSTimer *)timer {
+    // NSLog(@"DExtraClient: Checking if connection is alive");
+    if (!self.lastHeard)
+        return;
+    NSTimeInterval lastHeardInterval = [[NSDate date] timeIntervalSinceDate:self.lastHeard];
+
+    BOOL statusChanged = NO;
+    @synchronized (self) {
+        if (_status == DExtraClientStatusConnected && lastHeardInterval > 30) {
+            _status = DExtraClientStatusLost;
+            statusChanged = YES;
+        }
+    }
+    if (statusChanged)
+        [self.delegate dextraClient:self didChangeStatusTo:DExtraClientStatusLost];
+}
+
 - (void)ensureConnected:(NSTimer *)timer {
     NSLog(@"DExtraClient: Checking if connect succeeded");
     BOOL statusChanged = NO;
@@ -229,15 +256,20 @@ withFilterContext:(id)filterContext {
         NSLog(@"DExtraClient: Unknown packet with data: %@", data);
         return;
     }
-    
+
     NSLog(@"DExtraClient: Received packet: %@", packet);
+    NSLog(@"DExtraClient: Packet data: %@", data);
     self.lastHeard = [NSDate date];
     
     // Packets that don't change state
     if ([packet isKindOfClass:[DVFramePacket class]] || [packet isKindOfClass:[DVHeaderPacket class]]) {
+        if (!(self.status == DExtraClientStatusConnected))
+            return;
         return;
     }
     if ([packet isKindOfClass:[DExtraKeepAlivePacket class]]) {
+        if (!(self.status == DExtraClientStatusConnected))
+            return;
         DExtraKeepAlivePacket *keepAlivePacket = [[DExtraKeepAlivePacket alloc] initWithSrcCallsign:self.userCallsign];
         [self.socket sendData:[keepAlivePacket toData] toHost:self.host port:self.port withTimeout:3 tag:DExtraPacketTagKeepAlive];
         NSLog(@"DExtraClient: Exchanged keep alive packets");

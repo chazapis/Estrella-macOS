@@ -28,7 +28,7 @@
     char packet[14];
     
     [data getBytes:packet length:14];
-    NSString *ack = [[NSString alloc] initWithBytes:&(packet[10]) length:4 encoding:NSASCIIStringEncoding];
+    NSString *ack = [[NSString alloc] initWithBytes:&(packet[10]) length:3 encoding:NSASCIIStringEncoding];
     if (ack == nil || ![ack isEqualToString:@"ACK"])
         return nil;
     NSString *srcCallsign = [[NSString alloc] initWithBytes:&(packet[0]) length:8 encoding:NSASCIIStringEncoding];
@@ -67,7 +67,7 @@
     
     paddedCallsign = [self.srcCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
     [paddedCallsign getCString:&(packet[0]) maxLength:9 encoding:NSASCIIStringEncoding];
-    paddedModule = [self.srcCallsign stringByPaddingToLength:1 withString:@" " startingAtIndex:0];
+    paddedModule = [self.srcModule stringByPaddingToLength:1 withString:@" " startingAtIndex:0];
     [paddedModule getCString:&(packet[8]) maxLength:2 encoding:NSASCIIStringEncoding];
     paddedModule = [self.destModule stringByPaddingToLength:1 withString:@" " startingAtIndex:0];
     [paddedModule getCString:&(packet[9]) maxLength:2 encoding:NSASCIIStringEncoding];
