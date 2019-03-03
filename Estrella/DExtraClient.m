@@ -25,8 +25,6 @@
 #import "DExtraDisconnectPacket.h"
 #import "DExtraDisconnectAckPacket.h"
 #import "DExtraKeepAlivePacket.h"
-#import "DVHeaderPacket.h"
-#import "DVFramePacket.h"
 
 typedef NS_ENUM(NSInteger, DExtraPacketTag) {
     DExtraPacketTagConnect,
@@ -258,13 +256,20 @@ withFilterContext:(id)filterContext {
     }
 
     NSLog(@"DExtraClient: Received packet: %@", packet);
-    NSLog(@"DExtraClient: Packet data: %@", data);
+    // NSLog(@"DExtraClient: Packet data: %@", data);
     self.lastHeard = [NSDate date];
     
     // Packets that don't change state
-    if ([packet isKindOfClass:[DVFramePacket class]] || [packet isKindOfClass:[DVHeaderPacket class]]) {
+    if ([packet isKindOfClass:[DVFramePacket class]]) {
         if (!(self.status == DExtraClientStatusConnected))
             return;
+        [self.delegate dextraClient:self didReceiveDVFramePacket:packet];
+        return;
+    }
+    if ([packet isKindOfClass:[DVHeaderPacket class]]) {
+        if (!(self.status == DExtraClientStatusConnected))
+            return;
+        [self.delegate dextraClient:self didReceiveDVHeaderPacket:packet];
         return;
     }
     if ([packet isKindOfClass:[DExtraKeepAlivePacket class]]) {

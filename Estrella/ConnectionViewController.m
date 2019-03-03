@@ -18,9 +18,13 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #import "ConnectionViewController.h"
-#import "AppDelegate.h"
 
-@interface ConnectionViewController ()
+#import <AVFoundation/AVFoundation.h>
+#import <CocoaCodec2/codec2.h>
+
+@interface ConnectionViewController () {
+    struct CODEC2 *codec2State;
+};
 
 - (void)connect;
 - (void)disconnect;
@@ -29,6 +33,10 @@
 
 - (BOOL)isValidCallsign:(NSString *)callsign;
 - (BOOL)isValidModule:(NSString *)module;
+
+@property (nonatomic, strong) AVAudioEngine *audioEngine;
+@property (nonatomic, strong) AVAudioPlayerNode *audioPlayerNode;
+@property (nonatomic, strong) AVAudioFormat *audioPlayerFormat;
 
 @property (nonatomic, strong) DExtraClient *dextraClient;
 
@@ -45,19 +53,32 @@
 - (void)dealloc {
     if (self.dextraClient)
         [self.dextraClient disconnect];
+    codec2_destroy(codec2State);
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    // Codec context
+    codec2State = codec2_create(CODEC2_MODE_3200);
 
+    // Initialize audio
+    self.audioEngine = [[AVAudioEngine alloc] init];
+    self.audioPlayerNode = [[AVAudioPlayerNode alloc] init];
+    self.audioPlayerFormat = [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32 sampleRate:8000 channels:2 interleaved:NO];
+
+    NSError *error;
+    
+    [self.audioEngine attachNode:self.audioPlayerNode];
+    [self.audioEngine connect:self.audioPlayerNode to:self.audioEngine.mainMixerNode format:self.audioPlayerFormat];
+    [self.audioEngine prepare];
+    if (![self.audioEngine startAndReturnError:&error])
+        NSLog(@"ConnectionViewController: Could not start audio engine: %@", error.description);
+    // XXX: Start and stop for every transmission...
+    [self.audioPlayerNode play];
+
+    // Our connection to the server
     self.dextraClient = nil;
-
-    self.line1TextField.stringValue = @"";
-    self.line2TextField.stringValue = @"";
-    self.line3TextField.stringValue = @"";
-    self.line4TextField.stringValue = @"";
-    self.statusButton.enabled = NO;
-    self.statusButton.title = @"RX";
     
     // Get preferences
     NSDictionary *defaultPreferences = @{@"UserCallsign": @"",
@@ -84,6 +105,15 @@
         [[NSUserDefaults standardUserDefaults] setObject:@[defaultPreferences] forKey:@"Connections"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+}
+
+- (void)viewWillAppear {
+    self.line1TextField.stringValue = @"";
+    self.line2TextField.stringValue = @"";
+    self.line3TextField.stringValue = @"";
+    self.line4TextField.stringValue = @"";
+    self.statusButton.enabled = NO;
+    self.statusButton.title = @"RX";
 }
 
 - (void)viewDidAppear {
@@ -178,6 +208,28 @@
         case DExtraClientStatusDisconnecting:
             break;
     }
+}
+
+- (void)dextraClient:(DExtraClient *)client didReceiveDVHeaderPacket:(DVHeaderPacket *)dvHeader {
+}
+
+- (void)dextraClient:(DExtraClient *)client didReceiveDVFramePacket:(DVFramePacket *)dvFrame {
+    AVAudioPCMBuffer *audioPCMBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioPlayerFormat frameCapacity:160];
+
+    // Providing a PCM buffer with a single channel of 16 bit integers fails,
+    // so the voice data is converted to dual channel floating point
+    short *voice = (short *)malloc(sizeof(short) * 160);
+    float *fvoice = (float *)malloc(sizeof(float) * 160);
+    codec2_decode(codec2State, voice, dvFrame.dstarFrame.codec.bytes);
+    for (int i = 0; i < 160; i++)
+        fvoice[i] = ((float)voice[i]) / 32768.0;
+    audioPCMBuffer.frameLength = 160;
+    memcpy(audioPCMBuffer.floatChannelData[0], fvoice, sizeof(float) * 160);
+    memcpy(audioPCMBuffer.floatChannelData[1], fvoice, sizeof(float) * 160);
+    free(fvoice);
+    free(voice);
+
+    [self.audioPlayerNode scheduleBuffer:audioPCMBuffer completionHandler:nil];
 }
 
 # pragma mark PreferencesViewControllerDelegate

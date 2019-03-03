@@ -20,13 +20,16 @@
 #import <Foundation/Foundation.h>
 #import <CocoaAsyncSocket/GCDAsyncUdpSocket.h>
 
+#import "DVHeaderPacket.h"
+#import "DVFramePacket.h"
+
 typedef NS_ENUM(NSInteger, DExtraClientStatus) {
     DExtraClientStatusIdle,             // Not connected
     DExtraClientStatusConnecting,       // In the process of connecting
     DExtraClientStatusConnected,        // Connected (normal operation)
     DExtraClientStatusFailed,           // Connection failed
     DExtraClientStatusDisconnecting,    // In the process of disconnecting
-    DExtraClientStatusLost              // Connection lost and will try to reconnect
+    DExtraClientStatusLost              // Connection lost
 };
 
 NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status);
@@ -36,6 +39,8 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status);
 @protocol DExtraClientDelegate <NSObject>
 
 - (void)dextraClient:(DExtraClient *)client didChangeStatusTo:(DExtraClientStatus)status;
+- (void)dextraClient:(DExtraClient *)client didReceiveDVHeaderPacket:(DVHeaderPacket *)dvHeader;
+- (void)dextraClient:(DExtraClient *)client didReceiveDVFramePacket:(DVFramePacket *)dvFrame;
 
 @end
 

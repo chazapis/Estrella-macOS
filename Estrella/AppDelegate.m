@@ -19,9 +19,6 @@
 
 #import "AppDelegate.h"
 
-#import "DExtraClient.h"
-#import "DSTARHeader.h"
-
 @interface AppDelegate ()
 
 @end
