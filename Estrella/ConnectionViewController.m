@@ -34,11 +34,14 @@
 - (BOOL)isValidCallsign:(NSString *)callsign;
 - (BOOL)isValidModule:(NSString *)module;
 
+- (void)updateStatus:(NSTimer *)timer;
+
 @property (nonatomic, strong) AVAudioEngine *audioEngine;
 @property (nonatomic, strong) AVAudioPlayerNode *audioPlayerNode;
 @property (nonatomic, strong) AVAudioFormat *audioPlayerFormat;
 
 @property (nonatomic, strong) DExtraClient *dextraClient;
+@property (nonatomic, strong) NSTimer *statusTimer;
 
 @property (nonatomic, strong) NSString *userCallsign;
 @property (nonatomic, strong) NSString *reflectorCallsign;
@@ -53,6 +56,8 @@
 - (void)dealloc {
     if (self.dextraClient)
         [self.dextraClient disconnect];
+    if (self.statusTimer)
+        [self.statusTimer invalidate];
     codec2_destroy(codec2State);
 }
 
@@ -80,6 +85,9 @@
     // Our connection to the server
     self.dextraClient = nil;
     
+    // Update status every second
+    self.statusTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateStatus:) userInfo:nil repeats:YES];
+
     // Get preferences
     NSDictionary *defaultPreferences = @{@"UserCallsign": @"",
                                          @"ReflectorCallsign": @"",
@@ -108,10 +116,10 @@
 }
 
 - (void)viewWillAppear {
-    self.line1TextField.stringValue = @"";
-    self.line2TextField.stringValue = @"";
-    self.line3TextField.stringValue = @"";
-    self.line4TextField.stringValue = @"";
+    self.statusTextField.stringValue = @"";
+    self.fromTextField.stringValue = @"";
+    self.toTextField.stringValue = @"";
+    self.infoTextField.stringValue = @"";
     self.statusButton.enabled = NO;
     self.statusButton.title = @"RX";
 }
@@ -175,6 +183,15 @@
     if (!(c >= 'A' && c <= 'Z'))
         return NO;
     return YES;
+}
+
+- (void)updateStatus:(NSTimer *)timer {
+//    self.statusTextField = @"";
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.locale = [NSLocale currentLocale];
+    [dateFormatter setLocalizedDateFormatFromTemplate:@"HH:mm"];
+    NSString *status = [NSString stringWithFormat:@"%@  %@", [dateFormatter stringFromDate:[NSDate date]], self.reflectorCallsign];
+    self.statusTextField.stringValue = status;
 }
 
 - (IBAction)showPreferences:(id)sender {
