@@ -25,12 +25,12 @@
 @interface ConnectionViewController : NSViewController <DExtraClientDelegate, PreferencesViewControllerDelegate>
 
 - (IBAction)showPreferences:(id)sender;
+- (IBAction)pressPTT:(id)sender;
 
 @property (nonatomic, weak) IBOutlet NSTextField *statusTextField;
-@property (nonatomic, weak) IBOutlet NSTextField *fromTextField;
-@property (nonatomic, weak) IBOutlet NSTextField *toTextField;
+@property (nonatomic, weak) IBOutlet NSTextField *repeaterTextField;
+@property (nonatomic, weak) IBOutlet NSTextField *userTextField;
 @property (nonatomic, weak) IBOutlet NSTextField *infoTextField;
-@property (nonatomic, weak) IBOutlet NSButton *statusButton;
 @property (nonatomic, weak) IBOutlet NSButton *pttButton;
 
 @end

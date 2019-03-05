@@ -34,6 +34,7 @@
 - (BOOL)isValidCallsign:(NSString *)callsign;
 - (BOOL)isValidModule:(NSString *)module;
 
+- (void)updateDisplay;
 - (void)updateStatus:(NSTimer *)timer;
 
 @property (nonatomic, strong) AVAudioEngine *audioEngine;
@@ -48,6 +49,10 @@
 @property (nonatomic, strong) NSString *reflectorModule;
 @property (nonatomic, strong) NSString *reflectorHost;
 @property (nonatomic, assign) BOOL connectAutomatically;
+
+@property (nonatomic, assign) DExtraClientStatus clientStatus;
+@property (nonatomic, assign) BOOL isReceiving;
+@property (nonatomic, assign) BOOL isTransmitting;
 
 @end
 
@@ -113,15 +118,15 @@
         [[NSUserDefaults standardUserDefaults] setObject:@[defaultPreferences] forKey:@"Connections"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    
+    // Display variables
+    self.clientStatus = DExtraClientStatusIdle;
+    self.isReceiving = NO;
+    self.isTransmitting = NO;
 }
 
 - (void)viewWillAppear {
-    self.statusTextField.stringValue = @"";
-    self.fromTextField.stringValue = @"";
-    self.toTextField.stringValue = @"";
-    self.infoTextField.stringValue = @"";
-    self.statusButton.enabled = NO;
-    self.statusButton.title = @"RX";
+    [self updateDisplay];
 }
 
 - (void)viewDidAppear {
@@ -163,7 +168,7 @@
 - (BOOL)isValidCallsign:(NSString *)callsign {
     if ([callsign length] == 0)
         return YES;
-    if ([callsign length] > 8)
+    if ([callsign length] > 7) // The callsign without the module
         return NO;
     unichar c;
     for (int i = 0; i < [callsign length]; i++) {
@@ -185,13 +190,36 @@
     return YES;
 }
 
+- (void)updateDisplay {
+    if (self.isTransmitting || self.isReceiving) {
+        NSString *status = [NSString stringWithFormat:@"%@%@", [self.reflectorHost stringByPaddingToLength:18 withString:@" " startingAtIndex:0], (self.isTransmitting ? @"TX" : @"RX")];
+        NSMutableAttributedString *attributedStatus = [[NSMutableAttributedString alloc] initWithString:status];
+        [attributedStatus addAttribute:NSBackgroundColorAttributeName value:[NSColor blackColor] range:NSMakeRange(18, 2)];
+        [attributedStatus addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:NSMakeRange(18, 2)];
+        self.statusTextField.attributedStringValue = attributedStatus;
+    } else {
+        self.statusTextField.stringValue = self.reflectorHost;
+    }
+
+    if (self.clientStatus == DExtraClientStatusConnected) {
+        NSString *paddedReflectorCallsign = [self.reflectorCallsign stringByPaddingToLength:7 withString:@" " startingAtIndex:0];
+        NSString *repeater = [NSString stringWithFormat:@"%@%@ -> %@G", paddedReflectorCallsign, self.reflectorModule, paddedReflectorCallsign];
+        self.repeaterTextField.stringValue = repeater;
+        
+        NSString *paddedUserCallsign = [self.userCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
+        NSString *user = [NSString stringWithFormat:@"%@ -> CQCQCQ", paddedUserCallsign];
+        self.userTextField.stringValue = user;
+    } else {
+        self.repeaterTextField.stringValue = @"";
+        self.userTextField.stringValue = @"";
+    }
+    
+    self.infoTextField.stringValue = NSStringFromDExtraClientStatus(self.clientStatus);
+}
+
 - (void)updateStatus:(NSTimer *)timer {
-//    self.statusTextField = @"";
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.locale = [NSLocale currentLocale];
-    [dateFormatter setLocalizedDateFormatFromTemplate:@"HH:mm"];
-    NSString *status = [NSString stringWithFormat:@"%@  %@", [dateFormatter stringFromDate:[NSDate date]], self.reflectorCallsign];
-    self.statusTextField.stringValue = status;
+    // XXX: Check if we are stuck in RX or TX...
+    // [self updateDisplay];
 }
 
 - (IBAction)showPreferences:(id)sender {
@@ -225,6 +253,11 @@
         case DExtraClientStatusDisconnecting:
             break;
     }
+    
+    self.clientStatus = status;
+    self.isReceiving = NO;
+    self.isTransmitting = NO;
+    [self updateDisplay];
 }
 
 - (void)dextraClient:(DExtraClient *)client didReceiveDVHeaderPacket:(DVHeaderPacket *)dvHeader {

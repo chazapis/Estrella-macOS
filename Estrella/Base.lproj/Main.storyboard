@@ -763,14 +763,6 @@
                                     </subviews>
                                 </view>
                             </box>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YXF-EA-bv9">
-                                <rect key="frame" x="187" y="64" width="39" height="17"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" title="RX" bezelStyle="inline" alignment="center" borderStyle="border" inset="2" id="Gfu-Ja-DPq">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
-                                </buttonCell>
-                            </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Kqn-02-bf3">
                                 <rect key="frame" x="187" y="2" width="39" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -778,16 +770,18 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="pressPTT:" target="XfG-lQ-9wD" id="kR1-2O-9TM"/>
+                                </connections>
                             </button>
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="fromTextField" destination="dN2-fB-lIE" id="evE-Wq-INs"/>
                         <outlet property="infoTextField" destination="wPh-sD-SIy" id="3H2-Lx-Zg1"/>
                         <outlet property="pttButton" destination="Kqn-02-bf3" id="e74-LU-0Vv"/>
-                        <outlet property="statusButton" destination="YXF-EA-bv9" id="oR3-cr-Uoh"/>
+                        <outlet property="repeaterTextField" destination="dN2-fB-lIE" id="9LO-ZZ-s7p"/>
                         <outlet property="statusTextField" destination="uR3-IN-odS" id="mfl-Zh-ywh"/>
-                        <outlet property="toTextField" destination="REj-zA-6hx" id="Cib-B4-lI9"/>
+                        <outlet property="userTextField" destination="REj-zA-6hx" id="08e-bt-kir"/>
                         <segue destination="zKC-Vw-v7r" kind="sheet" identifier="ShowPreferencesSegue" id="zzB-ac-rlQ"/>
                     </connections>
                 </viewController>

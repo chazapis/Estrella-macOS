@@ -39,7 +39,7 @@
             errorDescription:(NSString * _Nullable *)error {
     if ([partialString length] == 0)
         return YES;
-    if ([partialString length] > 8) {
+    if ([partialString length] > 7) { // The callsign without the module
         *newString = nil;
         return NO;
     }

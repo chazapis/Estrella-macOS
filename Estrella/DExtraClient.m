@@ -35,17 +35,17 @@ typedef NS_ENUM(NSInteger, DExtraPacketTag) {
 NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
     switch (status) {
         case DExtraClientStatusIdle:
-            return @"Idle";
+            return @"Not Connected";
         case DExtraClientStatusConnecting:
             return @"Connecting";
         case DExtraClientStatusConnected:
             return @"Connected";
         case DExtraClientStatusFailed:
-            return @"Failed";
+            return @"Connection Failed";
         case DExtraClientStatusDisconnecting:
-            return @"Disconnected";
+            return @"Disconnecting";
         case DExtraClientStatusLost:
-            return @"Lost";
+            return @"Connection Lost";
     }
 }
 
