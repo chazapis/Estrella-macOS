@@ -40,6 +40,10 @@
 @property (nonatomic, strong) AVAudioEngine *audioEngine;
 @property (nonatomic, strong) AVAudioPlayerNode *audioPlayerNode;
 @property (nonatomic, strong) AVAudioFormat *audioPlayerFormat;
+@property (nonatomic, strong) AVAudioInputNode *audioInputNode;
+@property (nonatomic, strong) AVAudioFormat *audioInputFormat;
+@property (nonatomic, strong) AVAudioFormat *audioRecorderFormat;
+@property (nonatomic, strong) AVAudioConverter *audioRecorderConverter;
 
 @property (nonatomic, strong) DExtraClient *dextraClient;
 @property (nonatomic, strong) NSTimer *statusTimer;
@@ -76,7 +80,11 @@
     self.audioEngine = [[AVAudioEngine alloc] init];
     self.audioPlayerNode = [[AVAudioPlayerNode alloc] init];
     self.audioPlayerFormat = [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32 sampleRate:8000 channels:2 interleaved:NO];
-
+    self.audioInputNode = [self.audioEngine inputNode];
+    self.audioInputFormat = [self.audioInputNode outputFormatForBus:0];
+    self.audioRecorderFormat = [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatInt16 sampleRate:8000 channels:1 interleaved:NO];
+    self.audioRecorderConverter = [[AVAudioConverter alloc] initFromFormat:self.audioInputFormat toFormat:self.audioRecorderFormat];
+    
     NSError *error;
     
     [self.audioEngine attachNode:self.audioPlayerNode];
@@ -230,7 +238,23 @@
 }
 
 - (IBAction)pressPTT:(id)sender {
-    NSLog(@"pressPTT: %d", [(NSButton *)sender state]);
+    if ([(NSButton *)sender state] == NSControlStateValueOn) {
+        [self.audioInputNode installTapOnBus:0 bufferSize:(self.audioInputFormat.sampleRate * 0.2) format:self.audioInputFormat block:^(AVAudioPCMBuffer *inputBuffer, AVAudioTime *when) {
+            NSLog(@"ConnectionViewController: Got %d samples in the input buffer with format %@", inputBuffer.frameLength, inputBuffer.format);
+    
+            NSError *error;
+    
+            AVAudioPCMBuffer *recorderBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioRecorderFormat frameCapacity:self.audioRecorderFormat.sampleRate * 0.2];
+            AVAudioConverterOutputStatus status = [self.audioRecorderConverter convertToBuffer:recorderBuffer error:&error withInputFromBlock:^(AVAudioPacketCount inNumberOfPackets, AVAudioConverterInputStatus *outStatus) {
+                *outStatus = AVAudioConverterInputStatus_HaveData;
+                return inputBuffer;
+            }];
+            NSLog(@"ConnectionViewController: Converted to %d samples in the conversion buffer (status: %ld)", recorderBuffer.frameLength, status);
+            NSLog(@"DATA: %@", [[NSData alloc] initWithBytes:recorderBuffer.int16ChannelData[0] length:160]);
+        }];
+    } else {
+        [self.audioInputNode removeTapOnBus:0];
+    }
 }
 
 - (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
@@ -271,7 +295,7 @@
 }
 
 - (void)dextraClient:(DExtraClient *)client didReceiveDVFramePacket:(DVFramePacket *)dvFrame {
-    AVAudioPCMBuffer *audioPCMBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioPlayerFormat frameCapacity:160];
+    AVAudioPCMBuffer *playerBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioPlayerFormat frameCapacity:160];
 
     // Providing a PCM buffer with a single channel of 16 bit integers does not work,
     // so the voice data is converted to dual channel floating point
@@ -280,13 +304,13 @@
     codec2_decode(codec2State, voice, dvFrame.dstarFrame.codec.bytes);
     for (int i = 0; i < 160; i++)
         fvoice[i] = ((float)voice[i]) / 32768.0;
-    audioPCMBuffer.frameLength = 160;
-    memcpy(audioPCMBuffer.floatChannelData[0], fvoice, sizeof(float) * 160);
-    memcpy(audioPCMBuffer.floatChannelData[1], fvoice, sizeof(float) * 160);
+    playerBuffer.frameLength = 160;
+    memcpy(playerBuffer.floatChannelData[0], fvoice, sizeof(float) * 160);
+    memcpy(playerBuffer.floatChannelData[1], fvoice, sizeof(float) * 160);
     free(fvoice);
     free(voice);
 
-    [self.audioPlayerNode scheduleBuffer:audioPCMBuffer completionHandler:nil];
+    [self.audioPlayerNode scheduleBuffer:playerBuffer completionHandler:nil];
 }
 
 # pragma mark PreferencesViewControllerDelegate
