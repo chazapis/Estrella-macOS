@@ -130,14 +130,17 @@
 }
 
 - (void)viewDidAppear {
-    if (![self.userCallsign isEqualToString:@""] &&
-        ![self.reflectorCallsign isEqualToString:@""] &&
-        ![self.reflectorModule isEqualToString:@""] &&
-        ![self.reflectorHost isEqualToString:@""] &&
-        self.connectAutomatically) {
-        [self connect];
-    } else {
-        [self showPreferences:self];
+    // Do not show preferences when reappearing from minimize.
+    if (self.clientStatus == DExtraClientStatusIdle) {
+        if (![self.userCallsign isEqualToString:@""] &&
+            ![self.reflectorCallsign isEqualToString:@""] &&
+            ![self.reflectorModule isEqualToString:@""] &&
+            ![self.reflectorHost isEqualToString:@""] &&
+            self.connectAutomatically) {
+            [self connect];
+        } else {
+            [self showPreferences:self];
+        }
     }
 }
 
@@ -226,6 +229,10 @@
     [self performSegueWithIdentifier:@"ShowPreferencesSegue" sender:self];
 }
 
+- (IBAction)pressPTT:(id)sender {
+    NSLog(@"pressPTT: %d", [(NSButton *)sender state]);
+}
+
 - (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
     if (![segue.identifier isEqualToString:@"ShowPreferencesSegue"])
         return;
@@ -266,7 +273,7 @@
 - (void)dextraClient:(DExtraClient *)client didReceiveDVFramePacket:(DVFramePacket *)dvFrame {
     AVAudioPCMBuffer *audioPCMBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioPlayerFormat frameCapacity:160];
 
-    // Providing a PCM buffer with a single channel of 16 bit integers fails,
+    // Providing a PCM buffer with a single channel of 16 bit integers does not work,
     // so the voice data is converted to dual channel floating point
     short *voice = (short *)malloc(sizeof(short) * 160);
     float *fvoice = (float *)malloc(sizeof(float) * 160);
