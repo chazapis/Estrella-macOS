@@ -64,6 +64,10 @@
     return self;
 }
 
+- (BOOL)isLast {
+    return (self.packetId & 64) != 0;
+}
+
 - (NSData *)toData {
     char packet[27];
     

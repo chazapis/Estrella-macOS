@@ -22,6 +22,12 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CocoaCodec2/codec2.h>
 
+typedef NS_ENUM(NSInteger, RadioStatus) {
+    RadioStatusIdle,
+    RadioStatusReceiving,
+    RadioStatusTransmitting
+};
+
 @interface ConnectionViewController () {
     struct CODEC2 *codec2State;
 };
@@ -55,8 +61,8 @@
 @property (nonatomic, assign) BOOL connectAutomatically;
 
 @property (nonatomic, assign) DExtraClientStatus clientStatus;
-@property (nonatomic, assign) BOOL isReceiving;
-@property (nonatomic, assign) BOOL isTransmitting;
+@property (nonatomic, assign) RadioStatus radioStatus;
+@property (nonatomic, strong) DVHeaderPacket *receiveHeader;
 
 @end
 
@@ -129,8 +135,8 @@
     
     // Display variables
     self.clientStatus = DExtraClientStatusIdle;
-    self.isReceiving = NO;
-    self.isTransmitting = NO;
+    self.radioStatus = RadioStatusIdle;
+    self.receiveHeader = nil;
 }
 
 - (void)viewWillAppear {
@@ -202,8 +208,8 @@
 }
 
 - (void)updateDisplay {
-    if (self.isTransmitting || self.isReceiving) {
-        NSString *status = [NSString stringWithFormat:@"%@%@", [self.reflectorHost stringByPaddingToLength:18 withString:@" " startingAtIndex:0], (self.isTransmitting ? @"TX" : @"RX")];
+    if (self.radioStatus != RadioStatusIdle) {
+        NSString *status = [NSString stringWithFormat:@"%@%@", [self.reflectorHost stringByPaddingToLength:18 withString:@" " startingAtIndex:0], (self.radioStatus == RadioStatusTransmitting ? @"TX" : @"RX")];
         NSMutableAttributedString *attributedStatus = [[NSMutableAttributedString alloc] initWithString:status];
         [attributedStatus addAttribute:NSBackgroundColorAttributeName value:[NSColor blackColor] range:NSMakeRange(18, 2)];
         [attributedStatus addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:NSMakeRange(18, 2)];
@@ -213,13 +219,17 @@
     }
 
     if (self.clientStatus == DExtraClientStatusConnected) {
-        NSString *paddedReflectorCallsign = [self.reflectorCallsign stringByPaddingToLength:7 withString:@" " startingAtIndex:0];
-        NSString *repeater = [NSString stringWithFormat:@"%@%@ -> %@G", paddedReflectorCallsign, self.reflectorModule, paddedReflectorCallsign];
-        self.repeaterTextField.stringValue = repeater;
-        
-        NSString *paddedUserCallsign = [self.userCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
-        NSString *user = [NSString stringWithFormat:@"%@ -> CQCQCQ", paddedUserCallsign];
-        self.userTextField.stringValue = user;
+        if ((self.radioStatus == RadioStatusReceiving) && self.receiveHeader) {
+            DSTARHeader *dstarHeader = self.receiveHeader.dstarHeader;
+            self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", dstarHeader.repeater1Callsign, dstarHeader.repeater2Callsign];
+            self.userTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", dstarHeader.myCallsign, dstarHeader.urCallsign];
+        } else {
+            NSString *paddedReflectorCallsign = [self.reflectorCallsign stringByPaddingToLength:7 withString:@" " startingAtIndex:0];
+            self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@%@ -> %@G", paddedReflectorCallsign, self.reflectorModule, paddedReflectorCallsign];
+            
+            NSString *paddedUserCallsign = [self.userCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
+            self.userTextField.stringValue = [NSString stringWithFormat:@"%@ -> CQCQCQ", paddedUserCallsign];
+        }
     } else {
         self.repeaterTextField.stringValue = @"";
         self.userTextField.stringValue = @"";
@@ -239,6 +249,9 @@
 
 - (IBAction)pressPTT:(id)sender {
     if ([(NSButton *)sender state] == NSControlStateValueOn) {
+        self.radioStatus = RadioStatusTransmitting;
+        [self updateDisplay];
+
         [self.audioInputNode installTapOnBus:0 bufferSize:(self.audioInputFormat.sampleRate * 0.2) format:self.audioInputFormat block:^(AVAudioPCMBuffer *inputBuffer, AVAudioTime *when) {
             NSLog(@"ConnectionViewController: Got %d samples in the input buffer with format %@", inputBuffer.frameLength, inputBuffer.format);
     
@@ -254,6 +267,9 @@
         }];
     } else {
         [self.audioInputNode removeTapOnBus:0];
+        
+        self.radioStatus = RadioStatusIdle;
+        [self updateDisplay];
     }
 }
 
@@ -286,15 +302,32 @@
     }
     
     self.clientStatus = status;
-    self.isReceiving = NO;
-    self.isTransmitting = NO;
+    self.radioStatus = RadioStatusIdle;
     [self updateDisplay];
 }
 
 - (void)dextraClient:(DExtraClient *)client didReceiveDVHeaderPacket:(DVHeaderPacket *)dvHeader {
+    self.receiveHeader = dvHeader;
 }
 
 - (void)dextraClient:(DExtraClient *)client didReceiveDVFramePacket:(DVFramePacket *)dvFrame {
+    if ((self.radioStatus == RadioStatusTransmitting) ||
+        !self.receiveHeader ||
+        (self.receiveHeader.streamId != dvFrame.streamId))
+        return;
+    if (dvFrame.isLast) {
+        self.radioStatus = RadioStatusIdle;
+        self.receiveHeader = nil;
+        // self.pttButton.enabled = YES;
+        [self updateDisplay];
+        return;
+    }
+    if (self.radioStatus != RadioStatusReceiving) {
+        self.radioStatus = RadioStatusReceiving;
+        // self.pttButton.enabled = NO;
+        [self updateDisplay];
+    }
+
     AVAudioPCMBuffer *playerBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioPlayerFormat frameCapacity:160];
 
     // Providing a PCM buffer with a single channel of 16 bit integers does not work,

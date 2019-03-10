@@ -42,4 +42,6 @@
 @property(nonatomic, assign) unsigned char packetId;
 @property(nonatomic, strong) DSTARFrame *dstarFrame;
 
+@property(nonatomic, readonly) BOOL isLast;
+
 @end
