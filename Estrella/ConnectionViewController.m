@@ -41,7 +41,8 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 - (BOOL)isValidModule:(NSString *)module;
 
 - (void)updateDisplay;
-- (void)updateStatus:(NSTimer *)timer;
+
+- (void)checkStatus:(NSTimer *)timer;
 
 @property (nonatomic, strong) AVAudioEngine *audioEngine;
 @property (nonatomic, strong) AVAudioPlayerNode *audioPlayerNode;
@@ -52,6 +53,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 @property (nonatomic, strong) AVAudioConverter *audioRecorderConverter;
 
 @property (nonatomic, strong) DExtraClient *dextraClient;
+@property (atomic, strong) NSDate *statusCheckpoint;
 @property (nonatomic, strong) NSTimer *statusTimer;
 
 @property (nonatomic, strong) NSString *userCallsign;
@@ -104,8 +106,9 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     // Our connection to the server
     self.dextraClient = nil;
     
-    // Update status every second
-    self.statusTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateStatus:) userInfo:nil repeats:YES];
+    // Check if we are stuck in RX or TX
+    self.statusCheckpoint = nil;
+    self.statusTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(checkStatus:) userInfo:nil repeats:YES];
 
     // Get preferences
     NSDictionary *defaultPreferences = @{@"UserCallsign": @"",
@@ -238,9 +241,16 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     self.infoTextField.stringValue = NSStringFromDExtraClientStatus(self.clientStatus);
 }
 
-- (void)updateStatus:(NSTimer *)timer {
-    // XXX: Check if we are stuck in RX or TX...
-    // [self updateDisplay];
+- (void)checkStatus:(NSTimer *)timer {
+    if (self.radioStatus == RadioStatusIdle || !self.statusCheckpoint)
+        return;
+    NSTimeInterval statusCheckpointInterval = [[NSDate date] timeIntervalSinceDate:self.statusCheckpoint];
+
+    if ((self.radioStatus == RadioStatusTransmitting && statusCheckpointInterval > 120) ||
+        (self.radioStatus == RadioStatusReceiving && statusCheckpointInterval > 1)) {
+        self.radioStatus = RadioStatusIdle;
+        return;
+    }
 }
 
 - (void)setRadioStatus:(RadioStatus)radioStatus {
@@ -268,6 +278,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 
 - (IBAction)pressPTT:(id)sender {
     if ([(NSButton *)sender state] == NSControlStateValueOn) {
+        self.statusCheckpoint = [NSDate date];
         self.radioStatus = RadioStatusTransmitting;
 
         [self.audioInputNode installTapOnBus:0 bufferSize:(self.audioInputFormat.sampleRate * 0.2) format:self.audioInputFormat block:^(AVAudioPCMBuffer *inputBuffer, AVAudioTime *when) {
@@ -336,9 +347,15 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
         self.radioStatus = RadioStatusIdle;
         return;
     }
-    if (self.radioStatus != RadioStatusReceiving)
+    if (self.radioStatus != RadioStatusReceiving) {
+        self.statusCheckpoint = [NSDate date];
         self.radioStatus = RadioStatusReceiving;
-
+    } else {
+        // Update every 21 packets (packet IDs loop around every 420 ms)
+        if (dvFrame.packetId == 0)
+            self.statusCheckpoint = [NSDate date];
+    }
+    
     AVAudioPCMBuffer *playerBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioPlayerFormat frameCapacity:160];
 
     // Providing a PCM buffer with a single channel of 16 bit integers does not work,
