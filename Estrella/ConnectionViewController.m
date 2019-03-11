@@ -134,9 +134,9 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     }
     
     // Display variables
-    self.clientStatus = DExtraClientStatusIdle;
-    self.radioStatus = RadioStatusIdle;
-    self.receiveHeader = nil;
+    _clientStatus = DExtraClientStatusIdle;
+    _radioStatus = RadioStatusIdle; // Do not trigger a display update
+    _receiveHeader = nil;
 }
 
 - (void)viewWillAppear {
@@ -243,6 +243,25 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     // [self updateDisplay];
 }
 
+- (void)setRadioStatus:(RadioStatus)radioStatus {
+    // Enable and disable the PTT button in one place
+    @synchronized (self) {
+        _radioStatus = radioStatus;
+        switch (_radioStatus) {
+            case RadioStatusIdle:
+                self.pttButton.enabled = (self.clientStatus == DExtraClientStatusConnected);
+                break;
+            case RadioStatusReceiving:
+                self.pttButton.enabled = NO;
+                break;
+            case RadioStatusTransmitting:
+                break;
+        }
+    }
+    
+    [self updateDisplay];
+}
+
 - (IBAction)showPreferences:(id)sender {
     [self performSegueWithIdentifier:@"ShowPreferencesSegue" sender:self];
 }
@@ -250,7 +269,6 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 - (IBAction)pressPTT:(id)sender {
     if ([(NSButton *)sender state] == NSControlStateValueOn) {
         self.radioStatus = RadioStatusTransmitting;
-        [self updateDisplay];
 
         [self.audioInputNode installTapOnBus:0 bufferSize:(self.audioInputFormat.sampleRate * 0.2) format:self.audioInputFormat block:^(AVAudioPCMBuffer *inputBuffer, AVAudioTime *when) {
             NSLog(@"ConnectionViewController: Got %d samples in the input buffer with format %@", inputBuffer.frameLength, inputBuffer.format);
@@ -269,7 +287,6 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
         [self.audioInputNode removeTapOnBus:0];
         
         self.radioStatus = RadioStatusIdle;
-        [self updateDisplay];
     }
 }
 
@@ -303,7 +320,6 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     
     self.clientStatus = status;
     self.radioStatus = RadioStatusIdle;
-    [self updateDisplay];
 }
 
 - (void)dextraClient:(DExtraClient *)client didReceiveDVHeaderPacket:(DVHeaderPacket *)dvHeader {
@@ -316,17 +332,12 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
         (self.receiveHeader.streamId != dvFrame.streamId))
         return;
     if (dvFrame.isLast) {
-        self.radioStatus = RadioStatusIdle;
         self.receiveHeader = nil;
-        // self.pttButton.enabled = YES;
-        [self updateDisplay];
+        self.radioStatus = RadioStatusIdle;
         return;
     }
-    if (self.radioStatus != RadioStatusReceiving) {
+    if (self.radioStatus != RadioStatusReceiving)
         self.radioStatus = RadioStatusReceiving;
-        // self.pttButton.enabled = NO;
-        [self updateDisplay];
-    }
 
     AVAudioPCMBuffer *playerBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioPlayerFormat frameCapacity:160];
 
