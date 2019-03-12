@@ -22,6 +22,8 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CocoaCodec2/codec2.h>
 
+#import "DVStream.h"
+
 typedef NS_ENUM(NSInteger, RadioStatus) {
     RadioStatusIdle,
     RadioStatusReceiving,
@@ -65,6 +67,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 @property (nonatomic, assign) DExtraClientStatus clientStatus;
 @property (nonatomic, assign) RadioStatus radioStatus;
 @property (nonatomic, strong) DVHeaderPacket *receiveHeader;
+@property (nonatomic, strong) DVStream *transmitStream;
 
 @end
 
@@ -136,10 +139,11 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     
-    // Display variables
+    // Radio state
     _clientStatus = DExtraClientStatusIdle;
     _radioStatus = RadioStatusIdle; // Do not trigger a display update
     _receiveHeader = nil;
+    _transmitStream = nil;
 }
 
 - (void)viewWillAppear {
@@ -281,6 +285,18 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
         self.statusCheckpoint = [NSDate date];
         self.radioStatus = RadioStatusTransmitting;
 
+        NSString *paddedReflectorCallsign = [self.reflectorCallsign stringByPaddingToLength:7 withString:@" " startingAtIndex:0];
+        DSTARHeader *dstarHeader = [[DSTARHeader alloc] initWithFlag1:0
+                                                                flag2:0
+                                                                flag3:1 // Codec 2, mode 3200 without FEC
+                                                    repeater1Callsign:[NSString stringWithFormat:@"%@%@", paddedReflectorCallsign, self.reflectorModule]
+                                                    repeater2Callsign:[NSString stringWithFormat:@"%@G", paddedReflectorCallsign]
+                                                           urCallsign:@"CQCQCQ"
+                                                           myCallsign:self.userCallsign
+                                                             mySuffix:@""];
+        self.transmitStream = [[DVStream alloc] initWithDSTARHeader:dstarHeader];
+
+        // Get 200 ms worth of samples, which will be converted into 10 frames
         [self.audioInputNode installTapOnBus:0 bufferSize:(self.audioInputFormat.sampleRate * 0.2) format:self.audioInputFormat block:^(AVAudioPCMBuffer *inputBuffer, AVAudioTime *when) {
             NSLog(@"ConnectionViewController: Got %d samples in the input buffer with format %@", inputBuffer.frameLength, inputBuffer.format);
     
@@ -292,10 +308,23 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
                 return inputBuffer;
             }];
             NSLog(@"ConnectionViewController: Converted to %d samples in the conversion buffer (status: %ld)", recorderBuffer.frameLength, status);
-            NSLog(@"DATA: %@", [[NSData alloc] initWithBytes:recorderBuffer.int16ChannelData[0] length:160]);
+
+            unsigned char codec[9];
+            unsigned char data[] = {0x00, 0x00, 0x00};
+            for (int i = 0; i < recorderBuffer.frameLength; i += 160) {
+                codec2_encode(self->codec2State, codec, &(recorderBuffer.int16ChannelData[0][i]));
+                codec[8] = 0x00;
+                
+                DSTARFrame *dstarFrame = [[DSTARFrame alloc] initWithCodec:[[NSData alloc] initWithBytes:codec length:9]
+                                                                      data:[[NSData alloc] initWithBytes:data length:3]];
+                [self.transmitStream appendDSTARFrame:dstarFrame];
+            }
+
         }];
     } else {
         [self.audioInputNode removeTapOnBus:0];
+        // XXX: Synchronize...
+        [self.transmitStream markLast];
         
         self.radioStatus = RadioStatusIdle;
     }

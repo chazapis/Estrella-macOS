@@ -35,6 +35,7 @@
 		E292C0B82215389B009FE9A9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E292C0B72215389B009FE9A9 /* Assets.xcassets */; };
 		E292C0BB2215389B009FE9A9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E292C0B92215389B009FE9A9 /* Main.storyboard */; };
 		E292C0BE2215389B009FE9A9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E292C0BD2215389B009FE9A9 /* main.m */; };
+		E2E90B8F223846B5003AF348 /* DVStream.m in Sources */ = {isa = PBXBuildFile; fileRef = E2E90B8E223846B5003AF348 /* DVStream.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -109,6 +110,8 @@
 		E292C0BC2215389B009FE9A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E292C0BD2215389B009FE9A9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E292C0BF2215389B009FE9A9 /* Estrella.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Estrella.entitlements; sourceTree = "<group>"; };
+		E2E90B8D223846B5003AF348 /* DVStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVStream.h; sourceTree = "<group>"; };
+		E2E90B8E223846B5003AF348 /* DVStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVStream.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,6 +168,8 @@
 				E27CA633221A913000600899 /* DVHeaderPacket.m */,
 				E27CA635221AA3A300600899 /* DVFramePacket.h */,
 				E27CA636221AA3A300600899 /* DVFramePacket.m */,
+				E2E90B8D223846B5003AF348 /* DVStream.h */,
+				E2E90B8E223846B5003AF348 /* DVStream.m */,
 				E27CA638221AAD4500600899 /* DSTARHeader.h */,
 				E27CA639221AAD4500600899 /* DSTARHeader.m */,
 				E27CA63B221AAD8C00600899 /* DSTARFrame.h */,
@@ -294,6 +299,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E27CA61E2219264800600899 /* DExtraClient.m in Sources */,
+				E2E90B8F223846B5003AF348 /* DVStream.m in Sources */,
 				E27CA62E221A082E00600899 /* DExtraDisconnectAckPacket.m in Sources */,
 				E27CA631221A0B7300600899 /* DExtraKeepAlivePacket.m in Sources */,
 				E27CA637221AA3A300600899 /* DVFramePacket.m in Sources */,
