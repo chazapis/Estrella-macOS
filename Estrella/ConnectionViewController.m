@@ -22,6 +22,8 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CocoaCodec2/codec2.h>
 
+#include <unistd.h>
+
 #import "DVStream.h"
 
 typedef NS_ENUM(NSInteger, RadioStatus) {
@@ -263,6 +265,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
         _radioStatus = radioStatus;
         switch (_radioStatus) {
             case RadioStatusIdle:
+                // XXX: If transmitting, depress button and remove audio tap...
                 self.pttButton.enabled = (self.clientStatus == DExtraClientStatusConnected);
                 break;
             case RadioStatusReceiving:
@@ -298,7 +301,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 
         // Get 200 ms worth of samples, which will be converted into 10 frames
         [self.audioInputNode installTapOnBus:0 bufferSize:(self.audioInputFormat.sampleRate * 0.2) format:self.audioInputFormat block:^(AVAudioPCMBuffer *inputBuffer, AVAudioTime *when) {
-            NSLog(@"ConnectionViewController: Got %d samples in the input buffer with format %@", inputBuffer.frameLength, inputBuffer.format);
+            // NSLog(@"ConnectionViewController: Got %d samples in the input buffer with format %@", inputBuffer.frameLength, inputBuffer.format);
     
             NSError *error;
     
@@ -307,7 +310,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
                 *outStatus = AVAudioConverterInputStatus_HaveData;
                 return inputBuffer;
             }];
-            NSLog(@"ConnectionViewController: Converted to %d samples in the conversion buffer (status: %ld)", recorderBuffer.frameLength, status);
+            // NSLog(@"ConnectionViewController: Converted to %d samples in the conversion buffer (status: %ld)", recorderBuffer.frameLength, status);
 
             unsigned char codec[9];
             unsigned char data[] = {0x00, 0x00, 0x00};
@@ -321,10 +324,29 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
             }
 
         }];
+
+        [NSThread detachNewThreadWithBlock:^(void) {
+            @autoreleasepool {
+                // Keep these in case they change
+                DExtraClient *dextraClient = self.dextraClient;
+                DVStream *transmitStream = self.transmitStream;
+
+                // Wait for the first samples to arrive
+                NSLog(@"START dextraClient: %@", dextraClient);
+                while (transmitStream.dvPacketCount < 5)
+                    usleep(20000);
+                int i;
+                for (i = 0; i < transmitStream.dvPacketCount; i++) {
+                    NSLog(@"PACKET: %d of %ld", i + 1, transmitStream.dvPacketCount);
+                    [dextraClient sendDVPacket:[transmitStream dvPacketAtIndex:i]];
+                    usleep(20000);
+                }
+                NSLog(@"DONE isLast: %d", [[transmitStream dvPacketAtIndex:i - 1] isLast]);
+            }
+        }];
     } else {
         [self.audioInputNode removeTapOnBus:0];
-        // XXX: Synchronize...
-        [self.transmitStream markLast];
+        [self.transmitStream markLast]; // We should have some packets in the buffer for this to work
         
         self.radioStatus = RadioStatusIdle;
     }
@@ -362,16 +384,19 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     self.radioStatus = RadioStatusIdle;
 }
 
-- (void)dextraClient:(DExtraClient *)client didReceiveDVHeaderPacket:(DVHeaderPacket *)dvHeader {
-    self.receiveHeader = dvHeader;
-}
+- (void)dextraClient:(DExtraClient *)client didReceiveDVPacket:(id)packet {
+    if ([packet isKindOfClass:[DVHeaderPacket class]]) {
+        self.receiveHeader = (DVHeaderPacket *)packet;
+        return;
+    }
 
-- (void)dextraClient:(DExtraClient *)client didReceiveDVFramePacket:(DVFramePacket *)dvFrame {
+    DVFramePacket *dvFramePacket = (DVFramePacket *)packet;
+    
     if ((self.radioStatus == RadioStatusTransmitting) ||
         !self.receiveHeader ||
-        (self.receiveHeader.streamId != dvFrame.streamId))
+        (self.receiveHeader.streamId != dvFramePacket.streamId))
         return;
-    if (dvFrame.isLast) {
+    if (dvFramePacket.isLast) {
         self.receiveHeader = nil;
         self.radioStatus = RadioStatusIdle;
         return;
@@ -381,7 +406,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
         self.radioStatus = RadioStatusReceiving;
     } else {
         // Update every 21 packets (packet IDs loop around every 420 ms)
-        if (dvFrame.packetId == 0)
+        if (dvFramePacket.packetId == 0)
             self.statusCheckpoint = [NSDate date];
     }
     
@@ -391,7 +416,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     // so the voice data is converted to dual channel floating point
     short *voice = (short *)malloc(sizeof(short) * 160);
     float *fvoice = (float *)malloc(sizeof(float) * 160);
-    codec2_decode(codec2State, voice, dvFrame.dstarFrame.codec.bytes);
+    codec2_decode(codec2State, voice, dvFramePacket.dstarFrame.codec.bytes);
     for (int i = 0; i < 160; i++)
         fvoice[i] = ((float)voice[i]) / 32768.0;
     playerBuffer.frameLength = 160;

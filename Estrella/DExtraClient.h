@@ -39,8 +39,7 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status);
 @protocol DExtraClientDelegate <NSObject>
 
 - (void)dextraClient:(DExtraClient *)client didChangeStatusTo:(DExtraClientStatus)status;
-- (void)dextraClient:(DExtraClient *)client didReceiveDVHeaderPacket:(DVHeaderPacket *)dvHeader;
-- (void)dextraClient:(DExtraClient *)client didReceiveDVFramePacket:(DVFramePacket *)dvFrame;
+- (void)dextraClient:(DExtraClient *)client didReceiveDVPacket:(id)packet;
 
 @end
 
@@ -54,6 +53,8 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status);
 
 - (void)connect;
 - (void)disconnect;
+
+- (void)sendDVPacket:(id)packet;
 
 @property (nonatomic, weak) id <DExtraClientDelegate> delegate;
 @property (nonatomic, assign, readonly) DExtraClientStatus status;

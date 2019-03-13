@@ -28,6 +28,7 @@
 
 @property (nonatomic, strong) NSMutableArray *packetArray;
 @property (nonatomic, assign) unsigned char nextPacketId;
+@property (nonatomic, assign) BOOL hasLast;
 
 @end
 
@@ -46,28 +47,52 @@
         [self.packetArray addObject:dvHeaderPacket];
         
         _nextPacketId = 0;
+        _hasLast = NO;
     }
     return self;
 
 }
 
 - (void)appendDSTARFrame:(DSTARFrame *)dstarFrame {
-    DVFramePacket *dvFramePacket = [[DVFramePacket alloc] initWithBand1:0
-                                                                  band2:0
-                                                                  band3:0
-                                                               streamId:self.streamId
-                                                               packetId:self.nextPacketId
-                                                             dstarFrame:dstarFrame];
-
-    self.nextPacketId = (self.nextPacketId + 1) % 21;
-    [self.packetArray addObject:dvFramePacket];
+    @synchronized (self) {
+        if (self.hasLast)
+            return;
+        
+        DVFramePacket *dvFramePacket = [[DVFramePacket alloc] initWithBand1:0
+                                                                      band2:0
+                                                                      band3:0
+                                                                   streamId:self.streamId
+                                                                   packetId:self.nextPacketId
+                                                                 dstarFrame:dstarFrame];
+        
+        self.nextPacketId = (self.nextPacketId + 1) % 21;
+        [self.packetArray addObject:dvFramePacket];
+    }
 }
 
 - (void)markLast {
-    id packet = [self.packetArray lastObject];
-    
-    if ([packet isKindOfClass:[DVFramePacket class]]) {
-        ((DVFramePacket *)packet).packetId |= 0x40;
+    @synchronized (self) {
+        if (self.hasLast)
+            return;
+
+        id packet = [self.packetArray lastObject];
+        
+        if ([packet isKindOfClass:[DVFramePacket class]]) {
+            ((DVFramePacket *)packet).packetId |= 0x40;
+        }
+        self.hasLast = YES;
+    }
+}
+
+- (id)dvPacketAtIndex:(NSUInteger)index {
+    @synchronized (self) {
+        return [self.packetArray objectAtIndex:index];
+    }
+}
+
+- (NSUInteger)getDVPacketCount {
+    @synchronized (self) {
+        return self.packetArray.count;
     }
 }
 

@@ -19,6 +19,12 @@
 
 #import "DExtraClient.h"
 
+#ifdef DEXTRA_DEBUG
+#define DebugLog(...) NSLog(__VA_ARGS__)
+#else
+#define DebugLog(...)
+#endif
+
 #import "DExtraConnectPacket.h"
 #import "DExtraConnectAckPacket.h"
 #import "DExtraConnectNackPacket.h"
@@ -29,7 +35,8 @@
 typedef NS_ENUM(NSInteger, DExtraPacketTag) {
     DExtraPacketTagConnect,
     DExtraPacketTagDisconnect,
-    DExtraPacketTagKeepAlive
+    DExtraPacketTagKeepAlive,
+    DExtraPacketTagDV
 };
 
 NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
@@ -158,7 +165,7 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
     if (self.connectTimer)
         [self.connectTimer invalidate];
     self.connectTimer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(ensureConnected:) userInfo:nil repeats:NO];
-    NSLog(@"DExtraClient: Sent packet with data: %@", [connectPacket toData]);
+    DebugLog(@"DExtraClient: Sent packet with data: %@", [connectPacket toData]);
 }
 
 - (void)disconnect {
@@ -175,11 +182,21 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
     if (self.disconnectTimer)
         [self.disconnectTimer invalidate];
     self.disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(ensureDisonnected:) userInfo:nil repeats:NO];
-    NSLog(@"DExtraClient: Sent packet with data: %@", [disconnectPacket toData]);
+    DebugLog(@"DExtraClient: Sent packet with data: %@", [disconnectPacket toData]);
+}
+
+- (void)sendDVPacket:(id)packet {
+    if (!(self.status == DExtraClientStatusConnected) ||
+        !([packet isKindOfClass:[DVFramePacket class]] || [packet isKindOfClass:[DVHeaderPacket class]]))
+        return;
+
+    DebugLog(@"DExtraClient: Sending packet: %@", packet);
+    DebugLog(@"DExtraClient: Packet data: %@", [packet toData]);
+    [self.socket sendData:[packet toData] toHost:self.host port:self.port withTimeout:1 tag:DExtraPacketTagDV];
 }
 
 - (void)ensureAlive:(NSTimer *)timer {
-    // NSLog(@"DExtraClient: Checking if connection is alive");
+    DebugLog(@"DExtraClient: Checking if connection is alive");
     if (!self.lastHeard)
         return;
     NSTimeInterval lastHeardInterval = [[NSDate date] timeIntervalSinceDate:self.lastHeard];
@@ -196,7 +213,7 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
 }
 
 - (void)ensureConnected:(NSTimer *)timer {
-    NSLog(@"DExtraClient: Checking if connect succeeded");
+    DebugLog(@"DExtraClient: Checking if connect succeeded");
     BOOL statusChanged = NO;
     @synchronized (self) {
         if (_status == DExtraClientStatusConnecting) {
@@ -209,7 +226,7 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
 }
 
 - (void)ensureDisonnected:(NSTimer *)timer {
-    NSLog(@"DExtraClient: Checking if disconnect succeeded");
+    DebugLog(@"DExtraClient: Checking if disconnect succeeded");
     BOOL statusChanged = NO;
     @synchronized (self) {
         if (_status == DExtraClientStatusDisconnecting) {
@@ -224,7 +241,7 @@ NSString *NSStringFromDExtraClientStatus(DExtraClientStatus status) {
 #pragma mark GCDAsyncUdpSocketDelegate
 
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *)error {
-    NSLog(@"DExtraClient: Could not send data with tag: %ld error: %@", tag, [error localizedDescription]);
+    DebugLog(@"DExtraClient: Could not send data with tag: %ld error: %@", tag, [error localizedDescription]);
     if (tag == DExtraPacketTagConnect) {
         BOOL statusChanged = NO;
         @synchronized (self) {
@@ -255,21 +272,16 @@ withFilterContext:(id)filterContext {
         return;
     }
 
-    NSLog(@"DExtraClient: Received packet: %@", packet);
-    // NSLog(@"DExtraClient: Packet data: %@", data);
+    DebugLog(@"DExtraClient: Received packet: %@", packet);
+    DebugLog(@"DExtraClient: Packet data: %@", data);
     self.lastHeard = [NSDate date];
     
     // Packets that don't change state
-    if ([packet isKindOfClass:[DVFramePacket class]]) {
+    if ([packet isKindOfClass:[DVFramePacket class]] ||
+        [packet isKindOfClass:[DVHeaderPacket class]]) {
         if (!(self.status == DExtraClientStatusConnected))
             return;
-        [self.delegate dextraClient:self didReceiveDVFramePacket:packet];
-        return;
-    }
-    if ([packet isKindOfClass:[DVHeaderPacket class]]) {
-        if (!(self.status == DExtraClientStatusConnected))
-            return;
-        [self.delegate dextraClient:self didReceiveDVHeaderPacket:packet];
+        [self.delegate dextraClient:self didReceiveDVPacket:(id)packet];
         return;
     }
     if ([packet isKindOfClass:[DExtraKeepAlivePacket class]]) {
@@ -277,7 +289,7 @@ withFilterContext:(id)filterContext {
             return;
         DExtraKeepAlivePacket *keepAlivePacket = [[DExtraKeepAlivePacket alloc] initWithSrcCallsign:self.userCallsign];
         [self.socket sendData:[keepAlivePacket toData] toHost:self.host port:self.port withTimeout:3 tag:DExtraPacketTagKeepAlive];
-        NSLog(@"DExtraClient: Exchanged keep alive packets");
+        DebugLog(@"DExtraClient: Exchanged keep alive packets");
         return;
     }
 

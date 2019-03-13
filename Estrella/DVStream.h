@@ -29,6 +29,9 @@
 - (void)appendDSTARFrame:(DSTARFrame *)dstarFrame;
 - (void)markLast;
 
+- (id)dvPacketAtIndex:(NSUInteger)index;
+
 @property (nonatomic, readonly) unsigned short streamId;
+@property (nonatomic, readonly, getter=getDVPacketCount) NSUInteger dvPacketCount;
 
 @end
