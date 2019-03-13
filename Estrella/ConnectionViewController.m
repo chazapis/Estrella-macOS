@@ -306,7 +306,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
             NSError *error;
     
             AVAudioPCMBuffer *recorderBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioRecorderFormat frameCapacity:self.audioRecorderFormat.sampleRate * 0.2];
-            AVAudioConverterOutputStatus status = [self.audioRecorderConverter convertToBuffer:recorderBuffer error:&error withInputFromBlock:^(AVAudioPacketCount inNumberOfPackets, AVAudioConverterInputStatus *outStatus) {
+            AVAudioConverterOutputStatus status __unused = [self.audioRecorderConverter convertToBuffer:recorderBuffer error:&error withInputFromBlock:^(AVAudioPacketCount inNumberOfPackets, AVAudioConverterInputStatus *outStatus) {
                 *outStatus = AVAudioConverterInputStatus_HaveData;
                 return inputBuffer;
             }];
