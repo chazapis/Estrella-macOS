@@ -28,8 +28,8 @@
 - (IBAction)pressPTT:(id)sender;
 
 @property (nonatomic, weak) IBOutlet NSTextField *statusTextField;
-@property (nonatomic, weak) IBOutlet NSTextField *repeaterTextField;
 @property (nonatomic, weak) IBOutlet NSTextField *userTextField;
+@property (nonatomic, weak) IBOutlet NSTextField *repeaterTextField;
 @property (nonatomic, weak) IBOutlet NSTextField *infoTextField;
 @property (nonatomic, weak) IBOutlet NSButton *pttButton;
 

@@ -236,18 +236,18 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     if (self.clientStatus == DExtraClientStatusConnected) {
         if ((self.radioStatus == RadioStatusReceiving) && self.receiveHeader) {
             DSTARHeader *dstarHeader = self.receiveHeader.dstarHeader;
-            self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", dstarHeader.repeater1Callsign, dstarHeader.repeater2Callsign];
             self.userTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", dstarHeader.myCallsign, dstarHeader.urCallsign];
+            self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", dstarHeader.repeater1Callsign, dstarHeader.repeater2Callsign];
         } else {
-            NSString *paddedReflectorCallsign = [self.reflectorCallsign stringByPaddingToLength:7 withString:@" " startingAtIndex:0];
-            self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@%@ -> %@G", paddedReflectorCallsign, self.reflectorModule, paddedReflectorCallsign];
-            
             NSString *paddedUserCallsign = [self.userCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
             self.userTextField.stringValue = [NSString stringWithFormat:@"%@ -> CQCQCQ", paddedUserCallsign];
+
+            NSString *paddedReflectorCallsign = [self.reflectorCallsign stringByPaddingToLength:7 withString:@" " startingAtIndex:0];
+            self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@%@ -> %@G", paddedReflectorCallsign, self.reflectorModule, paddedReflectorCallsign];
         }
     } else {
-        self.repeaterTextField.stringValue = @"";
         self.userTextField.stringValue = @"";
+        self.repeaterTextField.stringValue = @"";
     }
     
     self.infoTextField.stringValue = NSStringFromDExtraClientStatus(self.clientStatus);
