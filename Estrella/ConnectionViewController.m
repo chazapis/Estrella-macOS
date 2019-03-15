@@ -223,14 +223,20 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 }
 
 - (void)updateDisplay {
+    // The display structure is:
+    // • Line 1: Show the frequency on the left ("NET" in our case), TX/RX status on the right
+    // • Line 2: Show from and to callsigns
+    // • Line 3: Show repeater and gateway callsigns
+    // • Line 4: Show user data on RX, connectivity status, or other information
+
     if (self.radioStatus != RadioStatusIdle) {
-        NSString *status = [NSString stringWithFormat:@"%@%@", [self.reflectorHost stringByPaddingToLength:18 withString:@" " startingAtIndex:0], (self.radioStatus == RadioStatusTransmitting ? @"TX" : @"RX")];
+        NSString *status = [NSString stringWithFormat:@"NET               %@", (self.radioStatus == RadioStatusTransmitting ? @"TX" : @"RX")];
         NSMutableAttributedString *attributedStatus = [[NSMutableAttributedString alloc] initWithString:status];
         [attributedStatus addAttribute:NSBackgroundColorAttributeName value:[NSColor blackColor] range:NSMakeRange(18, 2)];
         [attributedStatus addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:NSMakeRange(18, 2)];
         self.statusTextField.attributedStringValue = attributedStatus;
     } else {
-        self.statusTextField.stringValue = self.reflectorHost;
+        self.statusTextField.stringValue = @"NET";
     }
 
     if (self.clientStatus == DExtraClientStatusConnected) {
