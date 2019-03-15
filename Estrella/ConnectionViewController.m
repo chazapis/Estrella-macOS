@@ -56,6 +56,8 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 @property (nonatomic, strong) AVAudioFormat *audioRecorderFormat;
 @property (nonatomic, strong) AVAudioConverter *audioRecorderConverter;
 
+@property (nonatomic, strong) dispatch_queue_t transmitQueue;
+
 @property (nonatomic, strong) DExtraClient *dextraClient;
 @property (atomic, strong) NSDate *statusCheckpoint;
 @property (nonatomic, strong) NSTimer *statusTimer;
@@ -108,6 +110,10 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     // XXX: Start and stop for every transmission...
     [self.audioPlayerNode play];
 
+    // Transmit processing queue
+    self.transmitQueue = dispatch_queue_create("com.koomasi.Estrella.tx", NULL);
+    dispatch_set_target_queue(self.transmitQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
+    
     // Our connection to the server
     self.dextraClient = nil;
     
@@ -303,26 +309,27 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
         [self.audioInputNode installTapOnBus:0 bufferSize:(self.audioInputFormat.sampleRate * 0.2) format:self.audioInputFormat block:^(AVAudioPCMBuffer *inputBuffer, AVAudioTime *when) {
             // NSLog(@"ConnectionViewController: Got %d samples in the input buffer with format %@", inputBuffer.frameLength, inputBuffer.format);
     
-            NSError *error;
-    
-            AVAudioPCMBuffer *recorderBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioRecorderFormat frameCapacity:self.audioRecorderFormat.sampleRate * 0.2];
-            AVAudioConverterOutputStatus status __unused = [self.audioRecorderConverter convertToBuffer:recorderBuffer error:&error withInputFromBlock:^(AVAudioPacketCount inNumberOfPackets, AVAudioConverterInputStatus *outStatus) {
-                *outStatus = AVAudioConverterInputStatus_HaveData;
-                return inputBuffer;
-            }];
-            // NSLog(@"ConnectionViewController: Converted to %d samples in the conversion buffer (status: %ld)", recorderBuffer.frameLength, status);
-
-            unsigned char codec[9];
-            unsigned char data[] = {0x00, 0x00, 0x00};
-            for (int i = 0; i < recorderBuffer.frameLength; i += 160) {
-                codec2_encode(self->codec2State, codec, &(recorderBuffer.int16ChannelData[0][i]));
-                codec[8] = 0x00;
+            dispatch_async(self.transmitQueue, ^(void){
+                NSError *error;
                 
-                DSTARFrame *dstarFrame = [[DSTARFrame alloc] initWithCodec:[[NSData alloc] initWithBytes:codec length:9]
-                                                                      data:[[NSData alloc] initWithBytes:data length:3]];
-                [self.transmitStream appendDSTARFrame:dstarFrame];
-            }
-
+                AVAudioPCMBuffer *recorderBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioRecorderFormat frameCapacity:self.audioRecorderFormat.sampleRate * 0.2];
+                AVAudioConverterOutputStatus status __unused = [self.audioRecorderConverter convertToBuffer:recorderBuffer error:&error withInputFromBlock:^(AVAudioPacketCount inNumberOfPackets, AVAudioConverterInputStatus *outStatus) {
+                    *outStatus = AVAudioConverterInputStatus_HaveData;
+                    return inputBuffer;
+                }];
+                // NSLog(@"ConnectionViewController: Converted to %d samples in the conversion buffer (status: %ld)", recorderBuffer.frameLength, status);
+                
+                unsigned char codec[9];
+                unsigned char data[] = {0x00, 0x00, 0x00};
+                for (int i = 0; i < recorderBuffer.frameLength; i += 160) {
+                    codec2_encode(self->codec2State, codec, &(recorderBuffer.int16ChannelData[0][i]));
+                    codec[8] = 0x00;
+                    
+                    DSTARFrame *dstarFrame = [[DSTARFrame alloc] initWithCodec:[[NSData alloc] initWithBytes:codec length:9]
+                                                                          data:[[NSData alloc] initWithBytes:data length:3]];
+                    [self.transmitStream appendDSTARFrame:dstarFrame];
+                }
+            });
         }];
 
         [NSThread detachNewThreadWithBlock:^(void) {
@@ -332,16 +339,12 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
                 DVStream *transmitStream = self.transmitStream;
 
                 // Wait for the first samples to arrive
-                NSLog(@"START dextraClient: %@", dextraClient);
                 while (transmitStream.dvPacketCount < 5)
                     usleep(20000);
-                int i;
-                for (i = 0; i < transmitStream.dvPacketCount; i++) {
-                    NSLog(@"PACKET: %d of %ld", i + 1, transmitStream.dvPacketCount);
+                for (int i = 0; i < transmitStream.dvPacketCount; i++) {
                     [dextraClient sendDVPacket:[transmitStream dvPacketAtIndex:i]];
                     usleep(20000);
                 }
-                NSLog(@"DONE isLast: %d", [[transmitStream dvPacketAtIndex:i - 1] isLast]);
             }
         }];
     } else {
