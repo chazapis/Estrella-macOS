@@ -46,6 +46,9 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 
 - (void)updateDisplay;
 
+- (void)startTransmitting;
+- (void)stopTransmitting;
+
 - (void)checkStatus:(NSTimer *)timer;
 
 @property (nonatomic, strong) AVAudioEngine *audioEngine;
@@ -62,6 +65,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 @property (atomic, strong) NSDate *statusCheckpoint;
 @property (nonatomic, strong) NSTimer *statusTimer;
 
+@property (nonatomic, assign) BOOL firstRun;
 @property (nonatomic, strong) NSString *userCallsign;
 @property (nonatomic, strong) NSString *reflectorCallsign;
 @property (nonatomic, strong) NSString *reflectorModule;
@@ -122,6 +126,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     self.statusTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(checkStatus:) userInfo:nil repeats:YES];
 
     // Get preferences
+    self.firstRun = YES;
     NSDictionary *defaultPreferences = @{@"UserCallsign": @"",
                                          @"ReflectorCallsign": @"",
                                          @"ReflectorModule": @"",
@@ -159,8 +164,8 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 }
 
 - (void)viewDidAppear {
-    // Do not show preferences when reappearing from minimize.
-    if (self.clientStatus == DExtraClientStatusIdle) {
+    if (self.clientStatus == DExtraClientStatusIdle && self.firstRun) {
+        self.firstRun = NO; // Do this only once.
         if (![self.userCallsign isEqualToString:@""] &&
             ![self.reflectorCallsign isEqualToString:@""] &&
             ![self.reflectorModule isEqualToString:@""] &&
@@ -259,6 +264,72 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     self.infoTextField.stringValue = NSStringFromDExtraClientStatus(self.clientStatus);
 }
 
+- (void)startTransmitting {
+    self.statusCheckpoint = [NSDate date];
+    self.radioStatus = RadioStatusTransmitting;
+    
+    NSString *paddedReflectorCallsign = [self.reflectorCallsign stringByPaddingToLength:7 withString:@" " startingAtIndex:0];
+    DSTARHeader *dstarHeader = [[DSTARHeader alloc] initWithFlag1:0
+                                                            flag2:0
+                                                            flag3:1 // Codec 2, mode 3200 without FEC
+                                                repeater1Callsign:[NSString stringWithFormat:@"%@%@", paddedReflectorCallsign, self.reflectorModule]
+                                                repeater2Callsign:[NSString stringWithFormat:@"%@G", paddedReflectorCallsign]
+                                                       urCallsign:@"CQCQCQ"
+                                                       myCallsign:self.userCallsign
+                                                         mySuffix:@""];
+    self.transmitStream = [[DVStream alloc] initWithDSTARHeader:dstarHeader];
+    
+    // Get 200 ms worth of samples, which will be converted into 10 frames
+    [self.audioInputNode installTapOnBus:0 bufferSize:(self.audioInputFormat.sampleRate * 0.2) format:self.audioInputFormat block:^(AVAudioPCMBuffer *inputBuffer, AVAudioTime *when) {
+        // NSLog(@"ConnectionViewController: Got %d samples in the input buffer with format %@", inputBuffer.frameLength, inputBuffer.format);
+        
+        dispatch_async(self.transmitQueue, ^(void){
+            NSError *error;
+            
+            AVAudioPCMBuffer *recorderBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioRecorderFormat frameCapacity:self.audioRecorderFormat.sampleRate * 0.2];
+            AVAudioConverterOutputStatus status __unused = [self.audioRecorderConverter convertToBuffer:recorderBuffer error:&error withInputFromBlock:^(AVAudioPacketCount inNumberOfPackets, AVAudioConverterInputStatus *outStatus) {
+                *outStatus = AVAudioConverterInputStatus_HaveData;
+                return inputBuffer;
+            }];
+            // NSLog(@"ConnectionViewController: Converted to %d samples in the conversion buffer (status: %ld)", recorderBuffer.frameLength, status);
+            
+            unsigned char codec[9];
+            unsigned char data[] = {0x00, 0x00, 0x00};
+            for (int i = 0; i < recorderBuffer.frameLength; i += 160) {
+                codec2_encode(self->codec2State, codec, &(recorderBuffer.int16ChannelData[0][i]));
+                codec[8] = 0x00;
+                
+                DSTARFrame *dstarFrame = [[DSTARFrame alloc] initWithCodec:[[NSData alloc] initWithBytes:codec length:9]
+                                                                      data:[[NSData alloc] initWithBytes:data length:3]];
+                [self.transmitStream appendDSTARFrame:dstarFrame];
+            }
+        });
+    }];
+    
+    [NSThread detachNewThreadWithBlock:^(void) {
+        @autoreleasepool {
+            // Keep these in case they change
+            DExtraClient *dextraClient = self.dextraClient;
+            DVStream *transmitStream = self.transmitStream;
+            
+            // Wait for the first samples to arrive
+            while (transmitStream.dvPacketCount < 5)
+                usleep(20000);
+            for (int i = 0; i < transmitStream.dvPacketCount; i++) {
+                [dextraClient sendDVPacket:[transmitStream dvPacketAtIndex:i]];
+                usleep(20000);
+            }
+        }
+    }];
+}
+
+- (void)stopTransmitting {
+    [self.audioInputNode removeTapOnBus:0];
+    [self.transmitStream markLast]; // We should have some packets in the buffer for this to work
+    
+    self.radioStatus = RadioStatusIdle;
+}
+
 - (void)checkStatus:(NSTimer *)timer {
     if (self.radioStatus == RadioStatusIdle || !self.statusCheckpoint)
         return;
@@ -297,67 +368,9 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 
 - (IBAction)pressPTT:(id)sender {
     if ([(NSButton *)sender state] == NSControlStateValueOn) {
-        self.statusCheckpoint = [NSDate date];
-        self.radioStatus = RadioStatusTransmitting;
-
-        NSString *paddedReflectorCallsign = [self.reflectorCallsign stringByPaddingToLength:7 withString:@" " startingAtIndex:0];
-        DSTARHeader *dstarHeader = [[DSTARHeader alloc] initWithFlag1:0
-                                                                flag2:0
-                                                                flag3:1 // Codec 2, mode 3200 without FEC
-                                                    repeater1Callsign:[NSString stringWithFormat:@"%@%@", paddedReflectorCallsign, self.reflectorModule]
-                                                    repeater2Callsign:[NSString stringWithFormat:@"%@G", paddedReflectorCallsign]
-                                                           urCallsign:@"CQCQCQ"
-                                                           myCallsign:self.userCallsign
-                                                             mySuffix:@""];
-        self.transmitStream = [[DVStream alloc] initWithDSTARHeader:dstarHeader];
-
-        // Get 200 ms worth of samples, which will be converted into 10 frames
-        [self.audioInputNode installTapOnBus:0 bufferSize:(self.audioInputFormat.sampleRate * 0.2) format:self.audioInputFormat block:^(AVAudioPCMBuffer *inputBuffer, AVAudioTime *when) {
-            // NSLog(@"ConnectionViewController: Got %d samples in the input buffer with format %@", inputBuffer.frameLength, inputBuffer.format);
-    
-            dispatch_async(self.transmitQueue, ^(void){
-                NSError *error;
-                
-                AVAudioPCMBuffer *recorderBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioRecorderFormat frameCapacity:self.audioRecorderFormat.sampleRate * 0.2];
-                AVAudioConverterOutputStatus status __unused = [self.audioRecorderConverter convertToBuffer:recorderBuffer error:&error withInputFromBlock:^(AVAudioPacketCount inNumberOfPackets, AVAudioConverterInputStatus *outStatus) {
-                    *outStatus = AVAudioConverterInputStatus_HaveData;
-                    return inputBuffer;
-                }];
-                // NSLog(@"ConnectionViewController: Converted to %d samples in the conversion buffer (status: %ld)", recorderBuffer.frameLength, status);
-                
-                unsigned char codec[9];
-                unsigned char data[] = {0x00, 0x00, 0x00};
-                for (int i = 0; i < recorderBuffer.frameLength; i += 160) {
-                    codec2_encode(self->codec2State, codec, &(recorderBuffer.int16ChannelData[0][i]));
-                    codec[8] = 0x00;
-                    
-                    DSTARFrame *dstarFrame = [[DSTARFrame alloc] initWithCodec:[[NSData alloc] initWithBytes:codec length:9]
-                                                                          data:[[NSData alloc] initWithBytes:data length:3]];
-                    [self.transmitStream appendDSTARFrame:dstarFrame];
-                }
-            });
-        }];
-
-        [NSThread detachNewThreadWithBlock:^(void) {
-            @autoreleasepool {
-                // Keep these in case they change
-                DExtraClient *dextraClient = self.dextraClient;
-                DVStream *transmitStream = self.transmitStream;
-
-                // Wait for the first samples to arrive
-                while (transmitStream.dvPacketCount < 5)
-                    usleep(20000);
-                for (int i = 0; i < transmitStream.dvPacketCount; i++) {
-                    [dextraClient sendDVPacket:[transmitStream dvPacketAtIndex:i]];
-                    usleep(20000);
-                }
-            }
-        }];
+        [self startTransmitting];
     } else {
-        [self.audioInputNode removeTapOnBus:0];
-        [self.transmitStream markLast]; // We should have some packets in the buffer for this to work
-        
-        self.radioStatus = RadioStatusIdle;
+        [self stopTransmitting];
     }
 }
 

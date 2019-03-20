@@ -501,9 +501,9 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OUK-l6-kmV">
-                                <rect key="frame" x="14" y="11" width="103" height="18"/>
+                                <rect key="frame" x="14" y="11" width="105" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Auto connect" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Cc7-rM-Q6N">
+                                <buttonCell key="cell" type="check" title="Auto Connect" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Cc7-rM-Q6N">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -537,7 +537,6 @@ DQ
                         </subviews>
                     </view>
                     <connections>
-                        <outlet property="applyButton" destination="E6A-AU-YCW" id="4kI-Gm-iVn"/>
                         <outlet property="connectAutomaticallyButton" destination="OUK-l6-kmV" id="jjh-BI-i6D"/>
                         <outlet property="reflectorCallsignTextField" destination="Jva-0t-tej" id="RBc-jg-dgC"/>
                         <outlet property="reflectorHostTextField" destination="90q-PC-DDg" id="N6j-pg-f25"/>

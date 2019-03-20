@@ -39,6 +39,5 @@
 @property (nonatomic, weak) IBOutlet NSTextField *reflectorModuleTextField;
 @property (nonatomic, weak) IBOutlet NSTextField *reflectorHostTextField;
 @property (nonatomic, weak) IBOutlet NSButton *connectAutomaticallyButton;
-@property (nonatomic, weak) IBOutlet NSButton *applyButton;
 
 @end

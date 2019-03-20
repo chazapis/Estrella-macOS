@@ -25,7 +25,6 @@
     [super viewDidLoad];
 
     [self.delegate fillInPreferencesViewController:self];
-
 }
 
 - (IBAction)applyPressed:(id)sender {
