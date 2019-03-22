@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E23F15AC2244B509005CD170 /* DVCodec.m in Sources */ = {isa = PBXBuildFile; fileRef = E23F15AB2244B509005CD170 /* DVCodec.m */; };
 		E278ACDC2235B3690009D6EB /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = E278ACDB2235B3690009D6EB /* Credits.rtf */; };
 		E27B9D032223D3CF009C94F0 /* CallsignFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = E27B9D022223D3CF009C94F0 /* CallsignFormatter.m */; };
 		E27B9D062223D3E3009C94F0 /* ModuleFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = E27B9D052223D3E3009C94F0 /* ModuleFormatter.m */; };
@@ -65,6 +66,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E23F15AA2244B509005CD170 /* DVCodec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVCodec.h; sourceTree = "<group>"; };
+		E23F15AB2244B509005CD170 /* DVCodec.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVCodec.m; sourceTree = "<group>"; };
 		E278ACDB2235B3690009D6EB /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		E27B9D012223D3CF009C94F0 /* CallsignFormatter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallsignFormatter.h; sourceTree = "<group>"; };
 		E27B9D022223D3CF009C94F0 /* CallsignFormatter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CallsignFormatter.m; sourceTree = "<group>"; };
@@ -204,6 +207,8 @@
 				E27CA6222219EB8300600899 /* Packets */,
 				E27CA61C2219264800600899 /* DExtraClient.h */,
 				E27CA61D2219264800600899 /* DExtraClient.m */,
+				E23F15AA2244B509005CD170 /* DVCodec.h */,
+				E23F15AB2244B509005CD170 /* DVCodec.m */,
 				E292C0B422153899009FE9A9 /* ConnectionViewController.h */,
 				E292C0B522153899009FE9A9 /* ConnectionViewController.m */,
 				E27CA6452221DDEC00600899 /* PreferencesViewController.h */,
@@ -306,6 +311,7 @@
 				E27CA6212219D1A000600899 /* DExtraConnectPacket.m in Sources */,
 				E292C0B622153899009FE9A9 /* ConnectionViewController.m in Sources */,
 				E27CA6282219F5D200600899 /* DExtraConnectNackPacket.m in Sources */,
+				E23F15AC2244B509005CD170 /* DVCodec.m in Sources */,
 				E27CA6472221DDEC00600899 /* PreferencesViewController.m in Sources */,
 				E27B9D032223D3CF009C94F0 /* CallsignFormatter.m in Sources */,
 				E27CA642221BDB3400600899 /* NSData+CRC.m in Sources */,
