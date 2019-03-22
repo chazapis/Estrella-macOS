@@ -7,25 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E23F15AC2244B509005CD170 /* DVCodec.m in Sources */ = {isa = PBXBuildFile; fileRef = E23F15AB2244B509005CD170 /* DVCodec.m */; };
+		E23F15FC22455043005CD170 /* CocoaDV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E23F15FB22455042005CD170 /* CocoaDV.framework */; };
+		E23F15FD22455043005CD170 /* CocoaDV.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E23F15FB22455042005CD170 /* CocoaDV.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E23F15FF22455075005CD170 /* CocoaDV.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E23F15FE22455075005CD170 /* CocoaDV.framework.dSYM */; };
 		E278ACDC2235B3690009D6EB /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = E278ACDB2235B3690009D6EB /* Credits.rtf */; };
 		E27B9D032223D3CF009C94F0 /* CallsignFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = E27B9D022223D3CF009C94F0 /* CallsignFormatter.m */; };
 		E27B9D062223D3E3009C94F0 /* ModuleFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = E27B9D052223D3E3009C94F0 /* ModuleFormatter.m */; };
 		E27CA6162219224F00600899 /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27CA6152219224F00600899 /* CocoaAsyncSocket.framework */; };
 		E27CA6172219224F00600899 /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E27CA6152219224F00600899 /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E27CA61B221922CF00600899 /* CocoaAsyncSocket.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E27CA61A221922CF00600899 /* CocoaAsyncSocket.framework.dSYM */; };
-		E27CA61E2219264800600899 /* DExtraClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA61D2219264800600899 /* DExtraClient.m */; };
-		E27CA6212219D1A000600899 /* DExtraConnectPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA6202219D1A000600899 /* DExtraConnectPacket.m */; };
-		E27CA6252219F42B00600899 /* DExtraConnectAckPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA6242219F42B00600899 /* DExtraConnectAckPacket.m */; };
-		E27CA6282219F5D200600899 /* DExtraConnectNackPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA6272219F5D200600899 /* DExtraConnectNackPacket.m */; };
-		E27CA62B2219F66200600899 /* DExtraDisconnectPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA62A2219F66200600899 /* DExtraDisconnectPacket.m */; };
-		E27CA62E221A082E00600899 /* DExtraDisconnectAckPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA62D221A082E00600899 /* DExtraDisconnectAckPacket.m */; };
-		E27CA631221A0B7300600899 /* DExtraKeepAlivePacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA630221A0B7300600899 /* DExtraKeepAlivePacket.m */; };
-		E27CA634221A913000600899 /* DVHeaderPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA633221A913000600899 /* DVHeaderPacket.m */; };
-		E27CA637221AA3A300600899 /* DVFramePacket.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA636221AA3A300600899 /* DVFramePacket.m */; };
-		E27CA63A221AAD4500600899 /* DSTARHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA639221AAD4500600899 /* DSTARHeader.m */; };
-		E27CA63D221AAD8C00600899 /* DSTARFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA63C221AAD8C00600899 /* DSTARFrame.m */; };
-		E27CA642221BDB3400600899 /* NSData+CRC.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA641221BDB3400600899 /* NSData+CRC.m */; };
 		E27CA6472221DDEC00600899 /* PreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E27CA6462221DDEC00600899 /* PreferencesViewController.m */; };
 		E28687102227C15600913436 /* CocoaCodec2.framework.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = E286870E2227C15600913436 /* CocoaCodec2.framework.dSYM */; };
 		E28687112227C15600913436 /* CocoaCodec2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E286870F2227C15600913436 /* CocoaCodec2.framework */; };
@@ -36,7 +26,6 @@
 		E292C0B82215389B009FE9A9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E292C0B72215389B009FE9A9 /* Assets.xcassets */; };
 		E292C0BB2215389B009FE9A9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E292C0B92215389B009FE9A9 /* Main.storyboard */; };
 		E292C0BE2215389B009FE9A9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E292C0BD2215389B009FE9A9 /* main.m */; };
-		E2E90B8F223846B5003AF348 /* DVStream.m in Sources */ = {isa = PBXBuildFile; fileRef = E2E90B8E223846B5003AF348 /* DVStream.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -46,6 +35,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				E23F15FD22455043005CD170 /* CocoaDV.framework in Embed Frameworks */,
 				E28687142227C32500913436 /* CocoaCodec2.framework in Embed Frameworks */,
 				E27CA6172219224F00600899 /* CocoaAsyncSocket.framework in Embed Frameworks */,
 			);
@@ -58,6 +48,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				E23F15FF22455075005CD170 /* CocoaDV.framework.dSYM in CopyFiles */,
 				E28687122227C30700913436 /* CocoaCodec2.framework.dSYM in CopyFiles */,
 				E27CA61B221922CF00600899 /* CocoaAsyncSocket.framework.dSYM in CopyFiles */,
 			);
@@ -66,8 +57,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E23F15AA2244B509005CD170 /* DVCodec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVCodec.h; sourceTree = "<group>"; };
-		E23F15AB2244B509005CD170 /* DVCodec.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVCodec.m; sourceTree = "<group>"; };
+		E23F15FB22455042005CD170 /* CocoaDV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaDV.framework; path = Carthage/Build/Mac/CocoaDV.framework; sourceTree = "<group>"; };
+		E23F15FE22455075005CD170 /* CocoaDV.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = CocoaDV.framework.dSYM; path = Carthage/Build/Mac/CocoaDV.framework.dSYM; sourceTree = "<group>"; };
 		E278ACDB2235B3690009D6EB /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		E27B9D012223D3CF009C94F0 /* CallsignFormatter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallsignFormatter.h; sourceTree = "<group>"; };
 		E27B9D022223D3CF009C94F0 /* CallsignFormatter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CallsignFormatter.m; sourceTree = "<group>"; };
@@ -75,30 +66,6 @@
 		E27B9D052223D3E3009C94F0 /* ModuleFormatter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModuleFormatter.m; sourceTree = "<group>"; };
 		E27CA6152219224F00600899 /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaAsyncSocket.framework; path = Carthage/Build/Mac/CocoaAsyncSocket.framework; sourceTree = "<group>"; };
 		E27CA61A221922CF00600899 /* CocoaAsyncSocket.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = CocoaAsyncSocket.framework.dSYM; path = Carthage/Build/Mac/CocoaAsyncSocket.framework.dSYM; sourceTree = "<group>"; };
-		E27CA61C2219264800600899 /* DExtraClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DExtraClient.h; sourceTree = "<group>"; };
-		E27CA61D2219264800600899 /* DExtraClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DExtraClient.m; sourceTree = "<group>"; };
-		E27CA61F2219D1A000600899 /* DExtraConnectPacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DExtraConnectPacket.h; sourceTree = "<group>"; };
-		E27CA6202219D1A000600899 /* DExtraConnectPacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DExtraConnectPacket.m; sourceTree = "<group>"; };
-		E27CA6232219F42B00600899 /* DExtraConnectAckPacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DExtraConnectAckPacket.h; sourceTree = "<group>"; };
-		E27CA6242219F42B00600899 /* DExtraConnectAckPacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DExtraConnectAckPacket.m; sourceTree = "<group>"; };
-		E27CA6262219F5D200600899 /* DExtraConnectNackPacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DExtraConnectNackPacket.h; sourceTree = "<group>"; };
-		E27CA6272219F5D200600899 /* DExtraConnectNackPacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DExtraConnectNackPacket.m; sourceTree = "<group>"; };
-		E27CA6292219F66200600899 /* DExtraDisconnectPacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DExtraDisconnectPacket.h; sourceTree = "<group>"; };
-		E27CA62A2219F66200600899 /* DExtraDisconnectPacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DExtraDisconnectPacket.m; sourceTree = "<group>"; };
-		E27CA62C221A082E00600899 /* DExtraDisconnectAckPacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DExtraDisconnectAckPacket.h; sourceTree = "<group>"; };
-		E27CA62D221A082E00600899 /* DExtraDisconnectAckPacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DExtraDisconnectAckPacket.m; sourceTree = "<group>"; };
-		E27CA62F221A0B7300600899 /* DExtraKeepAlivePacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DExtraKeepAlivePacket.h; sourceTree = "<group>"; };
-		E27CA630221A0B7300600899 /* DExtraKeepAlivePacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DExtraKeepAlivePacket.m; sourceTree = "<group>"; };
-		E27CA632221A913000600899 /* DVHeaderPacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVHeaderPacket.h; sourceTree = "<group>"; };
-		E27CA633221A913000600899 /* DVHeaderPacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVHeaderPacket.m; sourceTree = "<group>"; };
-		E27CA635221AA3A300600899 /* DVFramePacket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVFramePacket.h; sourceTree = "<group>"; };
-		E27CA636221AA3A300600899 /* DVFramePacket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVFramePacket.m; sourceTree = "<group>"; };
-		E27CA638221AAD4500600899 /* DSTARHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DSTARHeader.h; sourceTree = "<group>"; };
-		E27CA639221AAD4500600899 /* DSTARHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DSTARHeader.m; sourceTree = "<group>"; };
-		E27CA63B221AAD8C00600899 /* DSTARFrame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DSTARFrame.h; sourceTree = "<group>"; };
-		E27CA63C221AAD8C00600899 /* DSTARFrame.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DSTARFrame.m; sourceTree = "<group>"; };
-		E27CA640221BDB3400600899 /* NSData+CRC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSData+CRC.h"; sourceTree = "<group>"; };
-		E27CA641221BDB3400600899 /* NSData+CRC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSData+CRC.m"; sourceTree = "<group>"; };
 		E27CA6452221DDEC00600899 /* PreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesViewController.h; sourceTree = "<group>"; };
 		E27CA6462221DDEC00600899 /* PreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesViewController.m; sourceTree = "<group>"; };
 		E286870E2227C15600913436 /* CocoaCodec2.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = CocoaCodec2.framework.dSYM; path = Carthage/Build/Mac/CocoaCodec2.framework.dSYM; sourceTree = "<group>"; };
@@ -113,8 +80,6 @@
 		E292C0BC2215389B009FE9A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E292C0BD2215389B009FE9A9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E292C0BF2215389B009FE9A9 /* Estrella.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Estrella.entitlements; sourceTree = "<group>"; };
-		E2E90B8D223846B5003AF348 /* DVStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DVStream.h; sourceTree = "<group>"; };
-		E2E90B8E223846B5003AF348 /* DVStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DVStream.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E23F15FC22455043005CD170 /* CocoaDV.framework in Frameworks */,
 				E28687112227C15600913436 /* CocoaCodec2.framework in Frameworks */,
 				E27CA6162219224F00600899 /* CocoaAsyncSocket.framework in Frameworks */,
 			);
@@ -144,43 +110,14 @@
 		E27CA6182219225300600899 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E27CA6152219224F00600899 /* CocoaAsyncSocket.framework */,
-				E27CA61A221922CF00600899 /* CocoaAsyncSocket.framework.dSYM */,
+				E23F15FB22455042005CD170 /* CocoaDV.framework */,
+				E23F15FE22455075005CD170 /* CocoaDV.framework.dSYM */,
 				E286870F2227C15600913436 /* CocoaCodec2.framework */,
 				E286870E2227C15600913436 /* CocoaCodec2.framework.dSYM */,
+				E27CA6152219224F00600899 /* CocoaAsyncSocket.framework */,
+				E27CA61A221922CF00600899 /* CocoaAsyncSocket.framework.dSYM */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		E27CA6222219EB8300600899 /* Packets */ = {
-			isa = PBXGroup;
-			children = (
-				E27CA61F2219D1A000600899 /* DExtraConnectPacket.h */,
-				E27CA6202219D1A000600899 /* DExtraConnectPacket.m */,
-				E27CA6232219F42B00600899 /* DExtraConnectAckPacket.h */,
-				E27CA6242219F42B00600899 /* DExtraConnectAckPacket.m */,
-				E27CA6262219F5D200600899 /* DExtraConnectNackPacket.h */,
-				E27CA6272219F5D200600899 /* DExtraConnectNackPacket.m */,
-				E27CA6292219F66200600899 /* DExtraDisconnectPacket.h */,
-				E27CA62A2219F66200600899 /* DExtraDisconnectPacket.m */,
-				E27CA62C221A082E00600899 /* DExtraDisconnectAckPacket.h */,
-				E27CA62D221A082E00600899 /* DExtraDisconnectAckPacket.m */,
-				E27CA62F221A0B7300600899 /* DExtraKeepAlivePacket.h */,
-				E27CA630221A0B7300600899 /* DExtraKeepAlivePacket.m */,
-				E27CA632221A913000600899 /* DVHeaderPacket.h */,
-				E27CA633221A913000600899 /* DVHeaderPacket.m */,
-				E27CA635221AA3A300600899 /* DVFramePacket.h */,
-				E27CA636221AA3A300600899 /* DVFramePacket.m */,
-				E2E90B8D223846B5003AF348 /* DVStream.h */,
-				E2E90B8E223846B5003AF348 /* DVStream.m */,
-				E27CA638221AAD4500600899 /* DSTARHeader.h */,
-				E27CA639221AAD4500600899 /* DSTARHeader.m */,
-				E27CA63B221AAD8C00600899 /* DSTARFrame.h */,
-				E27CA63C221AAD8C00600899 /* DSTARFrame.m */,
-				E27CA640221BDB3400600899 /* NSData+CRC.h */,
-				E27CA641221BDB3400600899 /* NSData+CRC.m */,
-			);
-			name = Packets;
 			sourceTree = "<group>";
 		};
 		E292C0A522153899009FE9A9 = {
@@ -204,11 +141,6 @@
 			isa = PBXGroup;
 			children = (
 				E27B9D002223D3A8009C94F0 /* Formatters */,
-				E27CA6222219EB8300600899 /* Packets */,
-				E27CA61C2219264800600899 /* DExtraClient.h */,
-				E27CA61D2219264800600899 /* DExtraClient.m */,
-				E23F15AA2244B509005CD170 /* DVCodec.h */,
-				E23F15AB2244B509005CD170 /* DVCodec.m */,
 				E292C0B422153899009FE9A9 /* ConnectionViewController.h */,
 				E292C0B522153899009FE9A9 /* ConnectionViewController.m */,
 				E27CA6452221DDEC00600899 /* PreferencesViewController.h */,
@@ -303,25 +235,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E27CA61E2219264800600899 /* DExtraClient.m in Sources */,
-				E2E90B8F223846B5003AF348 /* DVStream.m in Sources */,
-				E27CA62E221A082E00600899 /* DExtraDisconnectAckPacket.m in Sources */,
-				E27CA631221A0B7300600899 /* DExtraKeepAlivePacket.m in Sources */,
-				E27CA637221AA3A300600899 /* DVFramePacket.m in Sources */,
-				E27CA6212219D1A000600899 /* DExtraConnectPacket.m in Sources */,
 				E292C0B622153899009FE9A9 /* ConnectionViewController.m in Sources */,
-				E27CA6282219F5D200600899 /* DExtraConnectNackPacket.m in Sources */,
-				E23F15AC2244B509005CD170 /* DVCodec.m in Sources */,
 				E27CA6472221DDEC00600899 /* PreferencesViewController.m in Sources */,
 				E27B9D032223D3CF009C94F0 /* CallsignFormatter.m in Sources */,
-				E27CA642221BDB3400600899 /* NSData+CRC.m in Sources */,
-				E27CA63A221AAD4500600899 /* DSTARHeader.m in Sources */,
 				E292C0BE2215389B009FE9A9 /* main.m in Sources */,
-				E27CA62B2219F66200600899 /* DExtraDisconnectPacket.m in Sources */,
-				E27CA6252219F42B00600899 /* DExtraConnectAckPacket.m in Sources */,
 				E27B9D062223D3E3009C94F0 /* ModuleFormatter.m in Sources */,
-				E27CA634221A913000600899 /* DVHeaderPacket.m in Sources */,
-				E27CA63D221AAD8C00600899 /* DSTARFrame.m in Sources */,
 				E292C0B322153899009FE9A9 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

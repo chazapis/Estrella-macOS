@@ -18,8 +18,8 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #import <Cocoa/Cocoa.h>
+#import <CocoaDV/CocoaDV.h>
 
-#import "DExtraClient.h"
 #import "PreferencesViewController.h"
 
 @interface ConnectionViewController : NSViewController <DExtraClientDelegate, PreferencesViewControllerDelegate>
