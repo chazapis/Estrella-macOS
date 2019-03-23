@@ -239,8 +239,11 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     if (self.clientStatus == DExtraClientStatusConnected) {
         if ((self.radioStatus == RadioStatusReceiving) && self.receiveHeader) {
             DSTARHeader *dstarHeader = self.receiveHeader.dstarHeader;
-            self.userTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", dstarHeader.myCallsign, dstarHeader.urCallsign];
-            self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", dstarHeader.repeater1Callsign, dstarHeader.repeater2Callsign];
+            NSString *paddedMyCallsign = [dstarHeader.myCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
+            self.userTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", paddedMyCallsign, dstarHeader.urCallsign];
+
+            NSString *paddedRepeater1Callsign = [dstarHeader.repeater1Callsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
+            self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", paddedRepeater1Callsign, dstarHeader.repeater2Callsign];
         } else {
             NSString *paddedUserCallsign = [self.userCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
             self.userTextField.stringValue = [NSString stringWithFormat:@"%@ -> CQCQCQ", paddedUserCallsign];
