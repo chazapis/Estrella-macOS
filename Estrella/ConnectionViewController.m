@@ -146,6 +146,9 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     _radioStatus = RadioStatusIdle; // Do not trigger a display update
     _receiveHeader = nil;
     _transmitStream = nil;
+    
+    // Start with disabled PTT
+    self.pttButton.enabled = NO;
 }
 
 - (void)viewWillAppear {
