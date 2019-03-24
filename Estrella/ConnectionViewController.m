@@ -86,6 +86,10 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    [self.statusView setNeedsLayout:YES];
+    [self.statusView setWantsLayer:YES];
+    self.statusView.layer.cornerRadius = self.statusView.frame.size.height / 2.0;
     
     // Initialize audio
     self.audioEngine = [[AVAudioEngine alloc] init];
@@ -224,40 +228,33 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 }
 
 - (void)updateDisplay {
-    // The display structure is:
-    // • Line 1: Show the frequency on the left ("NET" in our case), TX/RX status on the right
-    // • Line 2: Show from and to callsigns
-    // • Line 3: Show repeater and gateway callsigns
-    // • Line 4: Show user data on RX, connectivity status, or other information
-
-    if (self.radioStatus != RadioStatusIdle) {
-        NSString *status = [NSString stringWithFormat:@"NET               %@", (self.radioStatus == RadioStatusTransmitting ? @"TX" : @"RX")];
-        NSMutableAttributedString *attributedStatus = [[NSMutableAttributedString alloc] initWithString:status];
-        [attributedStatus addAttribute:NSBackgroundColorAttributeName value:[NSColor blackColor] range:NSMakeRange(18, 2)];
-        [attributedStatus addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:NSMakeRange(18, 2)];
-        self.statusTextField.attributedStringValue = attributedStatus;
-    } else {
-        self.statusTextField.stringValue = @"NET";
+    NSColor *statusColor;
+    switch (self.radioStatus) {
+        case RadioStatusIdle:
+            statusColor = [NSColor whiteColor];
+            break;
+        case RadioStatusReceiving:
+            statusColor = [NSColor colorWithRed:0.196 green:0.804 blue:0.196 alpha:1.0];
+            break;
+        case RadioStatusTransmitting:
+            statusColor = [NSColor colorWithRed:0.878 green:0.055 blue:0.055 alpha:1.0];
+            break;
     }
 
+    [self.statusView setWantsLayer:YES];
+    self.statusView.layer.backgroundColor = [statusColor CGColor];
+    
     if (self.clientStatus == DExtraClientStatusConnected) {
+        self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@%@", [self.reflectorCallsign substringFromIndex:3], self.reflectorModule];
         if ((self.radioStatus == RadioStatusReceiving) && self.receiveHeader) {
             DSTARHeader *dstarHeader = self.receiveHeader.dstarHeader;
-            NSString *paddedMyCallsign = [dstarHeader.myCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
-            self.userTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", paddedMyCallsign, dstarHeader.urCallsign];
-
-            NSString *paddedRepeater1Callsign = [dstarHeader.repeater1Callsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
-            self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@ -> %@", paddedRepeater1Callsign, dstarHeader.repeater2Callsign];
+            self.userTextField.stringValue = [NSString stringWithFormat:@"%@ to %@", dstarHeader.myCallsign, dstarHeader.urCallsign];
         } else {
-            NSString *paddedUserCallsign = [self.userCallsign stringByPaddingToLength:8 withString:@" " startingAtIndex:0];
-            self.userTextField.stringValue = [NSString stringWithFormat:@"%@ -> CQCQCQ", paddedUserCallsign];
-
-            NSString *paddedReflectorCallsign = [self.reflectorCallsign stringByPaddingToLength:7 withString:@" " startingAtIndex:0];
-            self.repeaterTextField.stringValue = [NSString stringWithFormat:@"%@%@ -> %@G", paddedReflectorCallsign, self.reflectorModule, paddedReflectorCallsign];
+            self.userTextField.stringValue = [NSString stringWithFormat:@"%@ to CQCQCQ", self.userCallsign];
         }
     } else {
-        self.userTextField.stringValue = @"";
         self.repeaterTextField.stringValue = @"";
+        self.userTextField.stringValue = @"";
     }
     
     self.infoTextField.stringValue = NSStringFromDExtraClientStatus(self.clientStatus);

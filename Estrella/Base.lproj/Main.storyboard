@@ -357,48 +357,45 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ConnectionViewController" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="234" height="86"/>
+                        <rect key="frame" x="0.0" y="0.0" width="274" height="72"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <box fixedFrame="YES" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="cSC-h9-y6C">
-                                <rect key="frame" x="2" y="1" width="180" height="82"/>
+                                <rect key="frame" x="2" y="1" width="220" height="68"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" ambiguous="YES" id="zh1-Vb-31k">
-                                    <rect key="frame" x="2" y="2" width="176" height="78"/>
+                                    <rect key="frame" x="2" y="2" width="216" height="64"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uR3-IN-odS">
-                                            <rect key="frame" x="2" y="59" width="173" height="19"/>
+                                        <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BCW-5l-XoV">
+                                            <rect key="frame" x="8" y="9" width="48" height="48"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="01234567890123456789" id="WDe-cs-hHl">
-                                                <font key="font" size="14" name="Monaco"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
+                                            <subviews>
+                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dN2-fB-lIE">
+                                                    <rect key="frame" x="-2" y="14" width="52" height="19"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="393B" id="7Oc-4I-lGI">
+                                                        <font key="font" metaFont="system"/>
+                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                            </subviews>
+                                        </customView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="REj-zA-6hx">
-                                            <rect key="frame" x="2" y="40" width="173" height="19"/>
+                                            <rect key="frame" x="60" y="33" width="150" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="01234567890123456789" id="khl-GN-rbT">
-                                                <font key="font" size="14" name="Monaco"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dN2-fB-lIE">
-                                            <rect key="frame" x="2" y="21" width="173" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="01234567890123456789" id="7Oc-4I-lGI">
-                                                <font key="font" size="14" name="Monaco"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="SV9OAN to CQCQCQ" id="khl-GN-rbT">
+                                                <font key="font" metaFont="systemSemibold" size="13"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wPh-sD-SIy">
-                                            <rect key="frame" x="2" y="2" width="173" height="19"/>
+                                            <rect key="frame" x="60" y="15" width="150" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="01234567890123456789" id="yaA-Jq-wmy">
-                                                <font key="font" size="14" name="Monaco"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Connected" id="yaA-Jq-wmy">
+                                                <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -407,7 +404,7 @@
                                 </view>
                             </box>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Kqn-02-bf3">
-                                <rect key="frame" x="187" y="2" width="39" height="25"/>
+                                <rect key="frame" x="227" y="3" width="39" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="roundTextured" title="PTT" bezelStyle="texturedRounded" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="q1X-sA-Qay">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -423,14 +420,14 @@
                         <outlet property="infoTextField" destination="wPh-sD-SIy" id="3H2-Lx-Zg1"/>
                         <outlet property="pttButton" destination="Kqn-02-bf3" id="e74-LU-0Vv"/>
                         <outlet property="repeaterTextField" destination="dN2-fB-lIE" id="9LO-ZZ-s7p"/>
-                        <outlet property="statusTextField" destination="uR3-IN-odS" id="mfl-Zh-ywh"/>
+                        <outlet property="statusView" destination="BCW-5l-XoV" id="bRQ-S4-xPP"/>
                         <outlet property="userTextField" destination="REj-zA-6hx" id="08e-bt-kir"/>
                         <segue destination="zKC-Vw-v7r" kind="sheet" identifier="ShowPreferencesSegue" id="zzB-ac-rlQ"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-41" y="481"/>
+            <point key="canvasLocation" x="-101" y="481"/>
         </scene>
         <!--Preferences View Controller-->
         <scene sceneID="8Yk-yL-5tL">
