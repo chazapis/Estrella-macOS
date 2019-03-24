@@ -315,6 +315,8 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 
     if ((self.radioStatus == RadioStatusTransmitting && statusCheckpointInterval > 120) ||
         (self.radioStatus == RadioStatusReceiving && statusCheckpointInterval > 1)) {
+        if (self.radioStatus == RadioStatusTransmitting)
+            [self stopTransmitting];
         self.radioStatus = RadioStatusIdle;
         return;
     }
@@ -326,7 +328,8 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
         _radioStatus = radioStatus;
         switch (_radioStatus) {
             case RadioStatusIdle:
-                // XXX: If transmitting, depress button and remove audio tap...
+                if (self.pttButton.state == NSControlStateValueOn)
+                    self.pttButton.state = NSControlStateValueOff;
                 self.pttButton.enabled = ((self.clientStatus == DExtraClientStatusConnected) && self.microphoneAvailable);
                 break;
             case RadioStatusReceiving:
