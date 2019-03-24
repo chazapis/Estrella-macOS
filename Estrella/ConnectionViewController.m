@@ -60,6 +60,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 @property (nonatomic, strong) NSTimer *statusTimer;
 
 @property (nonatomic, assign) BOOL firstRun;
+@property (nonatomic, assign) BOOL firstConnect;
 @property (nonatomic, strong) NSString *userCallsign;
 @property (nonatomic, strong) NSString *reflectorCallsign;
 @property (nonatomic, strong) NSString *reflectorModule;
@@ -117,6 +118,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 
     // Get preferences
     self.firstRun = YES;
+    self.firstConnect = YES;
     NSDictionary *defaultPreferences = @{@"UserCallsign": @"",
                                          @"ReflectorCallsign": @"",
                                          @"ReflectorModule": @"",
@@ -371,12 +373,24 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
             [self connect];
             break;
         case DExtraClientStatusFailed:
+        {
+            if (self.firstConnect) {
+                self.firstConnect = NO;
+                NSAlert *alert = [[NSAlert alloc] init];
+                alert.alertStyle = NSAlertStyleCritical;
+                alert.messageText = @"Connection failed";
+                alert.informativeText = @"A connection to the reflector could not be established. Will retry, but please check the preferences and make sure network connectivity is available.";
+                [alert runModal];
+            }
+        }
         case DExtraClientStatusLost:
             // Wait a while before trying to reconnect
+            NSLog(@"ConnectionViewController: Reconnecting in 3 seconds");
             [self performSelector:@selector(connect) withObject:nil afterDelay:3];
             break;
-        case DExtraClientStatusConnecting:
         case DExtraClientStatusConnected:
+            self.firstConnect = NO;
+        case DExtraClientStatusConnecting:
         case DExtraClientStatusDisconnecting:
             break;
     }
@@ -494,6 +508,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
     if (!self.dextraClient) {
         [self connect];
     } else if (shouldReconnect) {
+        self.firstConnect = YES;
         [self disconnect];
     }
 }
