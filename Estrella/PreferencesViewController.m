@@ -28,8 +28,19 @@
 }
 
 - (IBAction)applyPressed:(id)sender {
-    [self.delegate applyChangesFromPreferencesViewController:self];
-    [self dismissController:self];
+    if ([self.userCallsignTextField.stringValue isEqualToString:@""] ||
+        [self.reflectorCallsignTextField.stringValue isEqualToString:@""] ||
+        [self.reflectorModuleTextField.stringValue isEqualToString:@""] ||
+        [self.reflectorHostTextField.stringValue isEqualToString:@""]) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.alertStyle = NSAlertStyleCritical;
+        alert.messageText = @"Empty configuration";
+        alert.informativeText = @"All fields are required to establish a connection to the reflector.";
+        [alert runModal];
+    } else {
+        [self.delegate applyChangesFromPreferencesViewController:self];
+        [self dismissController:self];
+    }
 }
 
 #pragma mark NSResponder
