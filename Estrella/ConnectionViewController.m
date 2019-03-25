@@ -87,7 +87,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self.statusView setNeedsLayout:YES];
+    [self.statusView.superview setNeedsLayout:YES];
     [self.statusView setWantsLayer:YES];
     self.statusView.layer.cornerRadius = self.statusView.frame.size.height / 2.0;
     
@@ -241,6 +241,7 @@ typedef NS_ENUM(NSInteger, RadioStatus) {
             break;
     }
 
+    [self.statusView.superview setNeedsLayout:YES];
     [self.statusView setWantsLayer:YES];
     self.statusView.layer.backgroundColor = [statusColor CGColor];
     
