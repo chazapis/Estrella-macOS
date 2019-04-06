@@ -6,6 +6,8 @@ Estrella is an open source and freely available radio-like client for ORF reflec
 
 Estrella uses [Carthage](https://github.com/Carthage/Carthage) for its dependencies. To build, run `carthage update --platform macOS` first.
 
+Pre-built binaries can be found in the [releases](https://github.com/chazapis/Estrella-macOS/releases) tab.
+
 ---
 
 Estrella uses the [CocoaDV](https://github.com/chazapis/CocoaDV) and [CocoaCodec2](https://github.com/chazapis/CocoaCodec2) Cocoa Frameworks. Estrella's macOS icon is based on [this icon](https://www.deviantart.com/rkrusty/art/Reeder-OS-X-464190500).
